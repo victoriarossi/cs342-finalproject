@@ -351,7 +351,37 @@ public class GuiClient extends Application{
 	}
 
 	public Scene createRulesScene(Stage primaryStage) {
-		VBox root = new VBox(10);
+		VBox root = new VBox(20);
+		root.setAlignment(Pos.CENTER);
+		root.setPadding(new Insets(20));
+		root.setStyle("-fx-background-color: #00BFFF");
+
+
+		// sets the title and styling
+		Label title = new Label("Game Rules");
+		title.setFont(javafx.scene.text.Font.font("Arial", 24));
+		title.setStyle("-fx-text-fill: #FFFFFF");
+
+		// sets all rules and makes sure the text wraps if it is too long for the window width
+		Label rule1 = new Label("1. Objective: The goal of Battleship is to sink all of your opponent's ships before they sink all of yours.");
+		rule1.setWrapText(true);
+
+		Label rule2 = new Label("2. Setup: Each player places their ships on a grid without the other player seeing where they are placed.");
+		rule2.setWrapText(true);
+
+		Label rule3 = new Label("3. Gameplay: Players take turns guessing grid coordinates to attack enemy ships.");
+		rule3.setWrapText(true);
+
+		Label rule4 = new Label("4. Scoring: The game ends when all ships of one player are sunk. The player who sinks all enemy ships first wins.");
+		rule4.setWrapText(true);
+
+		// creates return button and its styling/event handler
+		Button returnBtn = new Button("Return to Main Menu");
+		returnBtn.setFont(javafx.scene.text.Font.font("Arial", 16));
+		returnBtn.setStyle("-fx-background-color: #1e90ff; -fx-text-fill: white; -fx-cursor: hand");
+		returnBtn.setOnAction(e -> primaryStage.setScene(sceneMap.get("startScene")));
+
+		root.getChildren().addAll(title, rule1, rule2, rule3, rule4, returnBtn);
 
 		return new Scene(root, 800, 600);
 	}
