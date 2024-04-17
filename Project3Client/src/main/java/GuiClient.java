@@ -129,6 +129,8 @@ public class GuiClient extends Application{
 
 		// scene map for different scenes
 		sceneMap = new HashMap<String, Scene>();
+		sceneMap.put("startScene", createIntroScene(primaryStage));
+		sceneMap.put("rules", createRulesScene(primaryStage));
 		sceneMap.put("client",  createClientGui(primaryStage));
 		sceneMap.put("clientLogin", createLoginScene(primaryStage)); // adds login screen to scene map
 		sceneMap.put("options", createOptionsScene(primaryStage)); // adds the options screen to scene map
@@ -144,7 +146,7 @@ public class GuiClient extends Application{
             }
         });
 
-		primaryStage.setScene(sceneMap.get("clientLogin")); // starts the scene in the login scene
+		primaryStage.setScene(sceneMap.get("startScene")); // starts the scene in the login scene
 		primaryStage.setTitle("Client");
 		primaryStage.show();
 	}
@@ -346,6 +348,62 @@ public class GuiClient extends Application{
 		displayListUsers.setMaxHeight(250);
 		pane.setCenter(users);
 		return new Scene(pane, 500, 400);
+	}
+
+	public Scene createRulesScene(Stage primaryStage) {
+		VBox root = new VBox(10);
+
+		return new Scene(root, 800, 600);
+	}
+
+	public Scene createIntroScene(Stage primaryStage) {
+		StackPane root = new StackPane(); // overlay layout
+
+		// sets up the background image
+		String imgPath = "/battleship.jpg";
+		Image backgroundImg = new Image(getClass().getResourceAsStream(imgPath));
+		ImageView backgroundImageView = new ImageView(backgroundImg);
+		backgroundImageView.setFitHeight(600);
+		backgroundImageView.setFitWidth(800);
+		backgroundImageView.setPreserveRatio(false);
+		backgroundImageView.setSmooth(true);
+
+		// adds the ImageView as the first layer
+		root.getChildren().add(backgroundImageView);
+
+		// Title label and styling
+		Label header = new Label("BattleShip");
+		header.setFont(javafx.scene.text.Font.font("Arial", 36));
+		header.setStyle("-fx-text-fill: white; -fx-font-weight: bold;");
+
+		// Start Button and styling
+		Button startBtn = new Button("Start Game");
+		startBtn.setFont(javafx.scene.text.Font.font("Arial", 20));
+		startBtn.setPrefSize(200, 50);
+		startBtn.setStyle("-fx-background-color: #1e90ff; -fx-text-fill: white; -fx-cursor: hand");
+		startBtn.setOnAction(e -> primaryStage.setScene(sceneMap.get("clientLogin")));
+
+		// Rules Button and styling
+		Button rulesBtn = new Button("Rules");
+		rulesBtn.setFont(javafx.scene.text.Font.font("Arial", 20));
+		rulesBtn.setPrefSize(200, 50);
+		rulesBtn.setStyle("-fx-background-color: #1e90ff; -fx-text-fill: white; -fx-cursor: hand");
+		rulesBtn.setOnAction(e -> primaryStage.setScene(sceneMap.get("rules")));
+
+		// stores the start and rules button side by side
+		HBox buttonsBox = new HBox(10);
+		buttonsBox.getChildren().addAll(startBtn, rulesBtn);
+		buttonsBox.setAlignment(Pos.CENTER);
+
+		// stores everything in a vertical box
+		VBox layout = new VBox(20);
+		layout.getChildren().addAll(header, buttonsBox);
+		layout.setAlignment(Pos.CENTER);
+		layout.setPadding(new Insets(30, 0, 0, 0));
+
+		root.getChildren().add(layout);
+
+		return new Scene(root, 800, 600);
 	}
 
 	public Scene createSelectUserScene(Stage primaryStage){
