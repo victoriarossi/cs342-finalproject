@@ -11,6 +11,7 @@ public class Server{
 	ArrayList<ClientThread> clients = new ArrayList<ClientThread>();
 	static ArrayList<String> clientID = new ArrayList<>();
 	TheServer server;
+//	ArrayList<ArrayList<>>
 	private Consumer<Serializable> callback;
 
 

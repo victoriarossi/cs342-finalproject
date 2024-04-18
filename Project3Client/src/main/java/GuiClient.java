@@ -151,8 +151,29 @@ public class GuiClient extends Application{
 		primaryStage.show();
 	}
 
+	private Button getBackBtn(String scene, Stage primaryStage){
+		// Create back button
+		Image home = new Image("back_arrow.png");
+		ImageView homeView = new ImageView(home);
+		homeView.setFitHeight(15);
+		homeView.setFitWidth(15);
+		Button backBtn = new Button();
+
+		// brings you back to home screen on click
+		backBtn.setOnAction( e -> {
+			primaryStage.setScene(sceneMap.get(scene));
+		});
+		backBtn.setGraphic(homeView);
+		backBtn.setStyle(btnStyle.concat("-fx-font-size: 14; -fx-padding: 10; -fx-background-radius: 25px; -fx-cursor: hand"));
+		return backBtn;
+	}
+
 	// creates the initial login scene
 	private Scene createLoginScene(Stage primaryStage) {
+
+		BorderPane pane =  new BorderPane();
+
+		Button backBtn = getBackBtn("startScene", primaryStage);
 
 		// creates the title label and styles it
 		Label title = new Label("Enter username:");
@@ -178,8 +199,15 @@ public class GuiClient extends Application{
 		root.setStyle("-fx-background-color: #F4DAB3; -fx-font-family: 'serif'");
 		root.setAlignment(Pos.CENTER);
 
+		BorderPane.setAlignment(backBtn, Pos.TOP_LEFT);
+		pane.setTop(backBtn);
+		Color backgroundColor = Color.web("#F4DAB3");
+		pane.setBackground(new Background(new BackgroundFill(backgroundColor, CornerRadii.EMPTY, Insets.EMPTY)));
+
+		pane.setCenter(root); // sets the VBox as the central content of the BorderPane
+
 		// returns login scene
-		return new Scene(root,500, 400);
+		return new Scene(pane,800, 600);
 	}
 
 	// creates main client UI
@@ -252,7 +280,7 @@ public class GuiClient extends Application{
 
 		pane.setCenter(clientBox); // sets the VBox as the central content of the BorderPane
 
-		return new Scene(pane, 500, 400);
+		return new Scene(pane,800, 600);
 	}
 
 
@@ -285,32 +313,13 @@ public class GuiClient extends Application{
 
 	// creates options scene
 	public Scene createOptionsScene(Stage primaryStage){
-		Button sendMessage = new Button("Send Message");
-		Button users = new Button("View All Users");
-		Button messages = new Button("View Messages");
-		sendMessage.setStyle(btnStyle);
-		users.setStyle(btnStyle);
-		messages.setStyle(btnStyle);
 
-		// when you click send, changes the scene
-		sendMessage.setOnAction(e -> {
-			primaryStage.setScene(sceneMap.get("client"));
-		});
 
-		// when you click view users, changes the scene
-		users.setOnAction( e -> {
-			primaryStage.setScene(sceneMap.get("users"));
-		});
 
-		// changes scene when you click on View Messages
-		messages.setOnAction(e -> {
-			primaryStage.setScene(sceneMap.get("viewMessages"));
-		});
-
-		VBox root = new VBox(40, sendMessage, users, messages);
+		VBox root = new VBox(40);
 		root.setStyle("-fx-background-color: #F4DAB3; -fx-font-family: 'serif'");
 		root.setAlignment(Pos.CENTER);
-		return new Scene(root,500, 400);
+		return new Scene(root, 800, 600);
 	}
 
 	public Scene createViewUsersScene(Stage primaryStage){
@@ -347,15 +356,19 @@ public class GuiClient extends Application{
 		displayListUsers.setMaxWidth(400);
 		displayListUsers.setMaxHeight(250);
 		pane.setCenter(users);
-		return new Scene(pane, 500, 400);
+		return new Scene(pane, 800, 600);
 	}
 
 	public Scene createRulesScene(Stage primaryStage) {
+
+		BorderPane pane = new BorderPane();
+
 		VBox root = new VBox(20);
 		root.setAlignment(Pos.CENTER);
 		root.setPadding(new Insets(20));
 		root.setStyle("-fx-background-color: #00BFFF");
 
+		Button backBtn = getBackBtn("startScene", primaryStage);
 
 		// sets the title and styling
 		Label title = new Label("Game Rules");
@@ -376,14 +389,22 @@ public class GuiClient extends Application{
 		rule4.setWrapText(true);
 
 		// creates return button and its styling/event handler
-		Button returnBtn = new Button("Return to Main Menu");
-		returnBtn.setFont(javafx.scene.text.Font.font("Arial", 16));
-		returnBtn.setStyle("-fx-background-color: #1e90ff; -fx-text-fill: white; -fx-cursor: hand");
-		returnBtn.setOnAction(e -> primaryStage.setScene(sceneMap.get("startScene")));
+//		Button returnBtn = new Button("Return to Main Menu");
+//		returnBtn.setFont(javafx.scene.text.Font.font("Arial", 16));
+//		returnBtn.setStyle("-fx-background-color: #1e90ff; -fx-text-fill: white; -fx-cursor: hand");
+//		returnBtn.setOnAction(e -> primaryStage.setScene(sceneMap.get("startScene")));
 
-		root.getChildren().addAll(title, rule1, rule2, rule3, rule4, returnBtn);
+		BorderPane.setAlignment(backBtn, Pos.TOP_LEFT);
+		pane.setTop(backBtn);
 
-		return new Scene(root, 800, 600);
+		Color backgroundColor = Color.web("#F4DAB3");
+		pane.setBackground(new Background(new BackgroundFill(backgroundColor, CornerRadii.EMPTY, Insets.EMPTY)));
+
+		root.getChildren().addAll(title, rule1, rule2, rule3, rule4);
+
+		pane.setCenter(root);
+
+		return new Scene(pane, 800, 600);
 	}
 
 	public Scene createIntroScene(Stage primaryStage) {
@@ -498,7 +519,7 @@ public class GuiClient extends Application{
 		displayListItems.setMaxWidth(400);
 		displayListItems.setMaxHeight(200);
 		pane.setCenter(users);
-		return new Scene(pane, 500, 400);
+		return new Scene(pane,800, 600);
 	}
 
 	public Scene createViewMessages(Stage primaryStage) {
@@ -536,7 +557,7 @@ public class GuiClient extends Application{
 		listItems2.setMaxHeight(250);
 		pane.setCenter(vbox);
 
-		return new Scene(pane, 500, 400);
+		return new Scene(pane, 800, 600);
 	}
 
 	// helper function to update the user list
