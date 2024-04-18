@@ -68,7 +68,7 @@ public class GuiClient extends Application{
 				// checks if message indicates a valid username
 				if ("Ok Username".equals(msg.getMessageContent())) {
 					// updates the user list and goes to options screen
-					updateUserList(msg);
+//					updateUserList(msg);
 					primaryStage.setScene(sceneMap.get("options"));
 				}
 
@@ -132,7 +132,7 @@ public class GuiClient extends Application{
 		sceneMap = new HashMap<String, Scene>();
 		sceneMap.put("startScene", createIntroScene(primaryStage));
 		sceneMap.put("rules", createRulesScene(primaryStage));
-		sceneMap.put("client",  createClientGui(primaryStage));
+//		sceneMap.put("client",  createClientGui(primaryStage));
 		sceneMap.put("clientLogin", createLoginScene(primaryStage)); // adds login screen to scene map
 		sceneMap.put("options", createOptionsScene(primaryStage)); // adds the options screen to scene map
 		sceneMap.put("setUpShipScene", createSetUpShipScene(primaryStage));
@@ -148,7 +148,7 @@ public class GuiClient extends Application{
             }
         });
 
-		primaryStage.setScene(sceneMap.get("setUpShipScene")); // starts the scene in the login scene
+		primaryStage.setScene(sceneMap.get("startScene")); // starts the scene in the login scene
 		primaryStage.setTitle("Client");
 		primaryStage.show();
 	}
@@ -213,77 +213,77 @@ public class GuiClient extends Application{
 	}
 
 	// creates main client UI
-	public Scene createClientGui(Stage primaryStage) {
-		BorderPane pane =  new BorderPane();
-
-		// sets and styles the title of the send message screen
-		Label title = new Label("Input your message:");
-		title.setStyle(subtitleStyle + "; -fx-padding: 10");
-
-		messageTextField = new TextField();
-		messageTextField.setMaxWidth(250);
-		messageTextField.setStyle("-fx-padding: 10; -fx-background-radius: 25px;");
-
-		// label to show the recipient of the message
-		Label sendTo = new Label("Send to: ");
-		sendTo.setStyle(subtitleStyle);
-
-		// creates the buttons to send to all or 1 user
-		Button allUsers = new Button("All users");
-		Button oneUser = new Button("One user");
-		allUsers.setStyle(btnStyle);
-		oneUser.setStyle(btnStyle);
-		HBox btns = new HBox(20, allUsers, oneUser);
-		btns.setAlignment(Pos.CENTER);
-
-		// handles on click event for the all users button
-		allUsers.setOnAction( e -> {
-			String messageContent = messageTextField.getText();
-			String currUsername = clientConnection.getUsername();
-			Message msg = new Message(currUsername, messageContent, Message.MessageType.BROADCAST);
-			clientConnection.send(msg);
-			messageTextField.clear();
-		});
-
-		// handles on click event for sending to 1 user button
-		oneUser.setOnAction(e -> {
-			messageContent = messageTextField.getText();
-			primaryStage.setScene(sceneMap.get("selectUser"));
-		});
-
-		// disables sending buttons if message field is empty
-		allUsers.disableProperty().bind(messageTextField.textProperty().isEmpty());
-		oneUser.disableProperty().bind(messageTextField.textProperty().isEmpty());
-
-		// Create back button
-		Image home = new Image("back_arrow.png");
-		ImageView homeView = new ImageView(home);
-		homeView.setFitHeight(15);
-		homeView.setFitWidth(15);
-		Button backBtn = new Button();
-
-		// brings you back to options screen on click
-		backBtn.setOnAction( e -> {
-			primaryStage.setScene(sceneMap.get("options"));
-		});
-		backBtn.setGraphic(homeView);
-		backBtn.setStyle(btnStyle.concat("-fx-font-size: 14; -fx-padding: 10; -fx-background-radius: 25px; -fx-cursor: hand"));
-
-		BorderPane.setAlignment(backBtn, Pos.TOP_LEFT);
-		pane.setTop(backBtn);
-		Color backgroundColor = Color.web("#C7FBFF");
-		pane.setBackground(new Background(new BackgroundFill(backgroundColor, CornerRadii.EMPTY, Insets.EMPTY)));
-
-		// container for all main controls
-		clientBox = new VBox(20, title, messageTextField, sendTo, btns, listItems2);
-		clientBox.setStyle("-fx-background-color: #F4DAB3; -fx-font-family: 'serif'");
-		VBox.setMargin(clientBox, new Insets(30));
-		clientBox.setAlignment(Pos.CENTER);
-
-		pane.setCenter(clientBox); // sets the VBox as the central content of the BorderPane
-
-		return new Scene(pane,800, 600);
-	}
+//	public Scene createClientGui(Stage primaryStage) {
+//		BorderPane pane =  new BorderPane();
+//
+//		// sets and styles the title of the send message screen
+//		Label title = new Label("Input your message:");
+//		title.setStyle(subtitleStyle + "; -fx-padding: 10");
+//
+//		messageTextField = new TextField();
+//		messageTextField.setMaxWidth(250);
+//		messageTextField.setStyle("-fx-padding: 10; -fx-background-radius: 25px;");
+//
+//		// label to show the recipient of the message
+//		Label sendTo = new Label("Send to: ");
+//		sendTo.setStyle(subtitleStyle);
+//
+//		// creates the buttons to send to all or 1 user
+//		Button allUsers = new Button("All users");
+//		Button oneUser = new Button("One user");
+//		allUsers.setStyle(btnStyle);
+//		oneUser.setStyle(btnStyle);
+//		HBox btns = new HBox(20, allUsers, oneUser);
+//		btns.setAlignment(Pos.CENTER);
+//
+//		// handles on click event for the all users button
+//		allUsers.setOnAction( e -> {
+//			String messageContent = messageTextField.getText();
+//			String currUsername = clientConnection.getUsername();
+//			Message msg = new Message(currUsername, messageContent, Message.MessageType.BROADCAST);
+//			clientConnection.send(msg);
+//			messageTextField.clear();
+//		});
+//
+//		// handles on click event for sending to 1 user button
+//		oneUser.setOnAction(e -> {
+//			messageContent = messageTextField.getText();
+//			primaryStage.setScene(sceneMap.get("selectUser"));
+//		});
+//
+//		// disables sending buttons if message field is empty
+//		allUsers.disableProperty().bind(messageTextField.textProperty().isEmpty());
+//		oneUser.disableProperty().bind(messageTextField.textProperty().isEmpty());
+//
+//		// Create back button
+//		Image home = new Image("back_arrow.png");
+//		ImageView homeView = new ImageView(home);
+//		homeView.setFitHeight(15);
+//		homeView.setFitWidth(15);
+//		Button backBtn = new Button();
+//
+//		// brings you back to options screen on click
+//		backBtn.setOnAction( e -> {
+//			primaryStage.setScene(sceneMap.get("options"));
+//		});
+//		backBtn.setGraphic(homeView);
+//		backBtn.setStyle(btnStyle.concat("-fx-font-size: 14; -fx-padding: 10; -fx-background-radius: 25px; -fx-cursor: hand"));
+//
+//		BorderPane.setAlignment(backBtn, Pos.TOP_LEFT);
+//		pane.setTop(backBtn);
+//		Color backgroundColor = Color.web("#C7FBFF");
+//		pane.setBackground(new Background(new BackgroundFill(backgroundColor, CornerRadii.EMPTY, Insets.EMPTY)));
+//
+//		// container for all main controls
+//		clientBox = new VBox(20, title, messageTextField, sendTo, btns, listItems2);
+//		clientBox.setStyle("-fx-background-color: #F4DAB3; -fx-font-family: 'serif'");
+//		VBox.setMargin(clientBox, new Insets(30));
+//		clientBox.setAlignment(Pos.CENTER);
+//
+//		pane.setCenter(clientBox); // sets the VBox as the central content of the BorderPane
+//
+//		return new Scene(pane,800, 600);
+//	}
 
 
 	// shows popup for invalid usernames
@@ -291,7 +291,7 @@ public class GuiClient extends Application{
 
 		VBox root = new VBox(20);
 		root.setAlignment(Pos.CENTER);
-		root.setStyle("-fx-background-color: #F4DAB3");
+		root.setStyle("-fx-background-color: #C7FBFF");
 
 		// sets the header label and styles it
 		Label header = new Label(message);
@@ -308,7 +308,7 @@ public class GuiClient extends Application{
 		root.getChildren().addAll(header, returnBtn);
 
 		// shows the error scene if an invalid username is entered
-		Scene errorScene = new Scene(root, 500, 400);
+		Scene errorScene = new Scene(root, 800, 600);
 		primaryStage.setScene(errorScene);
 		primaryStage.show();
 	}
@@ -405,8 +405,8 @@ public class GuiClient extends Application{
 		playUserBtn.setOnAction(e -> primaryStage.setScene(sceneMap.get("setUpShipScene")));
 		playAIBtn.setOnAction(e -> primaryStage.setScene(sceneMap.get("setUpShipScene")));
 
-		VBox root = new VBox(40);
-		root.setStyle("-fx-background-color: #F4DAB3; -fx-font-family: 'serif'");
+		VBox root = new VBox(40, playUserBtn, playAIBtn);
+		root.setStyle("-fx-background-color: #C7FBFF; -fx-font-family: 'serif'");
 		root.setAlignment(Pos.CENTER);
 		return new Scene(root, 800, 600);
 	}
