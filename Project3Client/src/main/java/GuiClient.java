@@ -49,10 +49,9 @@ public class GuiClient extends Application{
 
 
 	// styling strings for different UI
-	String btnStyle = "-fx-background-color: #DDC6A3; -fx-text-fill: black; -fx-background-radius: 25px; -fx-padding: 14; -fx-cursor: hand; -fx-font-size: 18";
-	String titleStyle = "-fx-font-size: 24; -fx-font-weight: bold";
+	String btnStyle = "-fx-background-color: #259EE8; -fx-text-fill: black; -fx-background-radius: 25px; -fx-padding: 14; -fx-cursor: hand; -fx-font-size: 18";
+	String titleStyle = "-fx-font-size: 26; -fx-font-weight: bold; -fx-font-family: 'serif'; -fx-text-fill: #000000";
 	String subtitleStyle = "-fx-font-size: 18; -fx-font-weight: bold";
-	
 	
 	public static void main(String[] args) {
 		launch(args);
@@ -196,12 +195,12 @@ public class GuiClient extends Application{
 
 		connectBtn.setStyle(btnStyle);
 		VBox root = new VBox(40, title, usernameField, connectBtn);
-		root.setStyle("-fx-background-color: #F4DAB3; -fx-font-family: 'serif'");
+		root.setStyle("-fx-background-color: #C7FBFF; );
 		root.setAlignment(Pos.CENTER);
 
 		BorderPane.setAlignment(backBtn, Pos.TOP_LEFT);
 		pane.setTop(backBtn);
-		Color backgroundColor = Color.web("#F4DAB3");
+		Color backgroundColor = Color.web("#C7FBFF");
 		pane.setBackground(new Background(new BackgroundFill(backgroundColor, CornerRadii.EMPTY, Insets.EMPTY)));
 
 		pane.setCenter(root); // sets the VBox as the central content of the BorderPane
@@ -269,7 +268,7 @@ public class GuiClient extends Application{
 
 		BorderPane.setAlignment(backBtn, Pos.TOP_LEFT);
 		pane.setTop(backBtn);
-		Color backgroundColor = Color.web("#F4DAB3");
+		Color backgroundColor = Color.web("#C7FBFF");
 		pane.setBackground(new Background(new BackgroundFill(backgroundColor, CornerRadii.EMPTY, Insets.EMPTY)));
 
 		// container for all main controls
@@ -342,7 +341,7 @@ public class GuiClient extends Application{
 		BorderPane.setAlignment(backBtn, Pos.TOP_LEFT);
 		pane.setTop(backBtn);
 
-		Color backgroundColor = Color.web("#F4DAB3");
+		Color backgroundColor = Color.web("#C7FBFF");
 		pane.setBackground(new Background(new BackgroundFill(backgroundColor, CornerRadii.EMPTY, Insets.EMPTY)));
 
 		Label title = new Label("List of all users:");
@@ -366,14 +365,15 @@ public class GuiClient extends Application{
 		VBox root = new VBox(20);
 		root.setAlignment(Pos.CENTER);
 		root.setPadding(new Insets(20));
-		root.setStyle("-fx-background-color: #00BFFF");
+		root.setStyle("-fx-background-color: #C7FBFF");
 
 		Button backBtn = getBackBtn("startScene", primaryStage);
 
 		// sets the title and styling
 		Label title = new Label("Game Rules");
-		title.setFont(javafx.scene.text.Font.font("Arial", 24));
-		title.setStyle("-fx-text-fill: #FFFFFF");
+//		title.setFont(titleStyle);
+		title.setStyle(titleStyle);
+//		title.setStyle("-fx-text-fill: #000000");
 
 		// sets all rules and makes sure the text wraps if it is too long for the window width
 		Label rule1 = new Label("1. Objective: The goal of Battleship is to sink all of your opponent's ships before they sink all of yours.");
@@ -388,16 +388,10 @@ public class GuiClient extends Application{
 		Label rule4 = new Label("4. Scoring: The game ends when all ships of one player are sunk. The player who sinks all enemy ships first wins.");
 		rule4.setWrapText(true);
 
-		// creates return button and its styling/event handler
-//		Button returnBtn = new Button("Return to Main Menu");
-//		returnBtn.setFont(javafx.scene.text.Font.font("Arial", 16));
-//		returnBtn.setStyle("-fx-background-color: #1e90ff; -fx-text-fill: white; -fx-cursor: hand");
-//		returnBtn.setOnAction(e -> primaryStage.setScene(sceneMap.get("startScene")));
-
 		BorderPane.setAlignment(backBtn, Pos.TOP_LEFT);
 		pane.setTop(backBtn);
 
-		Color backgroundColor = Color.web("#F4DAB3");
+		Color backgroundColor = Color.web("#C7FBFF");
 		pane.setBackground(new Background(new BackgroundFill(backgroundColor, CornerRadii.EMPTY, Insets.EMPTY)));
 
 		root.getChildren().addAll(title, rule1, rule2, rule3, rule4);
@@ -429,16 +423,18 @@ public class GuiClient extends Application{
 
 		// Start Button and styling
 		Button startBtn = new Button("Start Game");
-		startBtn.setFont(javafx.scene.text.Font.font("Arial", 20));
+//		startBtn.setFont(javafx.scene.text.Font.font("Arial", 20));
 		startBtn.setPrefSize(200, 50);
-		startBtn.setStyle("-fx-background-color: #1e90ff; -fx-text-fill: white; -fx-cursor: hand");
+		startBtn.setStyle(btnStyle);
+//		startBtn.setStyle("-fx-background-color: #1e90ff; -fx-text-fill: white; -fx-cursor: hand");
 		startBtn.setOnAction(e -> primaryStage.setScene(sceneMap.get("clientLogin")));
 
 		// Rules Button and styling
 		Button rulesBtn = new Button("Rules");
-		rulesBtn.setFont(javafx.scene.text.Font.font("Arial", 20));
+//		rulesBtn.setFont(javafx.scene.text.Font.font("Arial", 20));
 		rulesBtn.setPrefSize(200, 50);
-		rulesBtn.setStyle("-fx-background-color: #1e90ff; -fx-text-fill: white; -fx-cursor: hand");
+		rulesBtn.setStyle(btnStyle);
+//		rulesBtn.setStyle("-fx-background-color: #1e90ff; -fx-text-fill: white; -fx-cursor: hand");
 		rulesBtn.setOnAction(e -> primaryStage.setScene(sceneMap.get("rules")));
 
 		// stores the start and rules button side by side
@@ -477,7 +473,7 @@ public class GuiClient extends Application{
 		BorderPane.setAlignment(backBtn, Pos.TOP_LEFT);
 		pane.setTop(backBtn);
 
-		Color backgroundColor = Color.web("#F4DAB3");
+		Color backgroundColor = Color.web("#C7FBFF");
 		pane.setBackground(new Background(new BackgroundFill(backgroundColor, CornerRadii.EMPTY, Insets.EMPTY)));
 
 		Label title = new Label("Select the user you want to send to:");
@@ -542,7 +538,7 @@ public class GuiClient extends Application{
 		BorderPane.setAlignment(backBtn, Pos.TOP_LEFT);
 		pane.setTop(backBtn);
 
-		Color backgroundColor = Color.web("#F4DAB3");
+		Color backgroundColor = Color.web("#C7FBFF");
 		pane.setBackground(new Background(new BackgroundFill(backgroundColor, CornerRadii.EMPTY, Insets.EMPTY)));
 
 		Label title = new Label("Messages");
