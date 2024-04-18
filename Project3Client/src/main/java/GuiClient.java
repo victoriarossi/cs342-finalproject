@@ -38,7 +38,6 @@ public class GuiClient extends Application{
 	TextField c1;
 	Button b1;
 	HashMap<String, Scene> sceneMap;
-	VBox clientBox;
 	Client clientConnection;
 
 	private String messageContent;
@@ -167,6 +166,7 @@ public class GuiClient extends Application{
 		});
 		backBtn.setGraphic(homeView);
 		backBtn.setStyle(btnStyle.concat("-fx-font-size: 14; -fx-padding: 10; -fx-background-radius: 25px; -fx-cursor: hand"));
+
 		return backBtn;
 	}
 
@@ -359,6 +359,8 @@ public class GuiClient extends Application{
 	class offset { double x, y; } // helper class to store x and y offsets for dragging
 
 	public Scene createSetUpShipScene(Stage primaryStage) {
+		BorderPane pane =  new BorderPane();
+		Button backBtn = getBackBtn("options", primaryStage);
 		VBox root = new VBox(10);
 		Pane shipContainer = new Pane(); // container to hold all ships
 		shipContainer.setPrefSize(300, 150);
@@ -379,8 +381,13 @@ public class GuiClient extends Application{
 		}
 
 		root.getChildren().addAll(new Label("Place your ships:"), shipContainer);
+		BorderPane.setAlignment(backBtn, Pos.TOP_LEFT);
+		pane.setTop(backBtn);
 
-		return new Scene(root, 800, 600);
+		Color backgroundColor = Color.web("#C7FBFF");
+		pane.setBackground(new Background(new BackgroundFill(backgroundColor, CornerRadii.EMPTY, Insets.EMPTY)));
+		pane.setCenter(root);
+		return new Scene(pane, 800, 600);
 	}
 
 	private void setupGrid(Pane boardPane) {
@@ -400,7 +407,11 @@ public class GuiClient extends Application{
 	// creates options scene
 	public Scene createOptionsScene(Stage primaryStage){
 		Button playUserBtn = new Button("Play User");
+		playUserBtn.setStyle(btnStyle);
+		playUserBtn.setPrefSize(100, 50);
 		Button playAIBtn = new Button("Play AI");
+		playAIBtn.setStyle(btnStyle);
+		playAIBtn.setPrefSize(100, 50);
 
 		playUserBtn.setOnAction(e -> primaryStage.setScene(sceneMap.get("setUpShipScene")));
 		playAIBtn.setOnAction(e -> primaryStage.setScene(sceneMap.get("setUpShipScene")));
@@ -444,6 +455,7 @@ public class GuiClient extends Application{
 		users.setAlignment(Pos.CENTER);
 		displayListUsers.setMaxWidth(400);
 		displayListUsers.setMaxHeight(250);
+
 		pane.setCenter(users);
 		return new Scene(pane, 800, 600);
 	}
