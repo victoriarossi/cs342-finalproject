@@ -2,6 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/Project3Client/Project3Client.iml" filepath="$PROJECT_DIR$/Project3Client/Project3Client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Project3Server/Project3Server.iml" filepath="$PROJECT_DIR$/Project3Server/Project3Server.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/cs342-finalproject.iml" filepath="$PROJECT_DIR$/.idea/cs342-finalproject.iml" />
     </modules>
   </component>

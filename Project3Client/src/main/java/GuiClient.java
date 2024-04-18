@@ -9,6 +9,7 @@ import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
@@ -17,6 +18,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -133,6 +135,7 @@ public class GuiClient extends Application{
 		sceneMap.put("client",  createClientGui(primaryStage));
 		sceneMap.put("clientLogin", createLoginScene(primaryStage)); // adds login screen to scene map
 		sceneMap.put("options", createOptionsScene(primaryStage)); // adds the options screen to scene map
+		sceneMap.put("setUpShipScene", createSetUpShipScene(primaryStage));
 		sceneMap.put("users", createViewUsersScene(primaryStage)); // adds the view users screen to scene map
 		sceneMap.put("selectUser", createSelectUserScene(primaryStage)); //add the select user screen to scene map
 		sceneMap.put("viewMessages", createViewMessages(primaryStage));
@@ -145,7 +148,7 @@ public class GuiClient extends Application{
             }
         });
 
-		primaryStage.setScene(sceneMap.get("startScene")); // starts the scene in the login scene
+		primaryStage.setScene(sceneMap.get("setUpShipScene")); // starts the scene in the login scene
 		primaryStage.setTitle("Client");
 		primaryStage.show();
 	}
@@ -195,7 +198,7 @@ public class GuiClient extends Application{
 
 		connectBtn.setStyle(btnStyle);
 		VBox root = new VBox(40, title, usernameField, connectBtn);
-		root.setStyle("-fx-background-color: #C7FBFF; );
+		root.setStyle("-fx-background-color: #C7FBFF; ");
 		root.setAlignment(Pos.CENTER);
 
 		BorderPane.setAlignment(backBtn, Pos.TOP_LEFT);
@@ -310,10 +313,97 @@ public class GuiClient extends Application{
 		primaryStage.show();
 	}
 
+	private void enableDrag(Rectangle ship) {
+		final offset drag = new offset(); // holds offset from mouse click to ship's origin
+		final int cellSize = 30; // size of each cell in grid
+		final int gridSize = 10; // 10x10 grid
+
+		// event handler for mouse press actions on ship
+		ship.setOnMousePressed(e -> {
+
+			// calculates and stores the offset from where ship is clicked.
+			drag.x = e.getSceneX() - (ship.getX() + ship.getTranslateX());
+			drag.y = e.getSceneY() - (ship.getY() + ship.getTranslateY());
+			ship.setCursor(Cursor.MOVE); // changes cursor to drag
+		});
+
+		// event handler for mouse drag
+		ship.setOnMouseDragged(e -> {
+			// updates ship's position based on cursor's current position minus offset
+			ship.setTranslateX(e.getSceneX() - drag.x - ship.getX());
+			ship.setTranslateY(e.getSceneY() - drag.y - ship.getY());
+		});
+
+		// event handler for mouse release
+		ship.setOnMouseReleased(e -> {
+			ship.setCursor(Cursor.HAND); // change cursor back to default
+
+			// calculates the nearest grid position to place ship
+			double potentialNewX = Math.round((ship.getTranslateX() + ship.getX()) / cellSize) * cellSize;
+			double potentialNewY = Math.round((ship.getTranslateY() + ship.getY()) / cellSize) * cellSize;
+
+			// set ship's position to the nearest grid point if over the grid
+			if (potentialNewX >= 0 && potentialNewX + ship.getWidth() <= cellSize * gridSize &&
+				potentialNewY >= 0 && potentialNewY + ship.getHeight() <= cellSize * gridSize) {
+				ship.setTranslateX(potentialNewX - ship.getX());
+				ship.setTranslateY(potentialNewY - ship.getY());
+			}
+			// reset position if not a valid drop
+			else {
+				ship.setTranslateX(0);
+				ship.setTranslateY(0);
+			}
+		});
+	}
+
+	class offset { double x, y; } // helper class to store x and y offsets for dragging
+
+	public Scene createSetUpShipScene(Stage primaryStage) {
+		VBox root = new VBox(10);
+		Pane shipContainer = new Pane(); // container to hold all ships
+		shipContainer.setPrefSize(300, 150);
+
+		setupGrid(shipContainer); // grid setup in ship container
+
+		int xOffset = 10; // initial horizontal offset for first ship
+		int[] shipLengths = {5, 4, 3, 3, 2}; // all ship lengths
+		for (int length : shipLengths) {
+			Rectangle ship = new Rectangle(length * 30, 30); // creates ship with specific size
+			ship.setFill(Color.GRAY);
+			enableDrag(ship); // enables dragging functionality
+			ship.setX(xOffset); // sets initial x position of ship
+			ship.setY(525); // sets initial y position of ship
+			xOffset += (length * 30) + 10; // increments x offset for next ship
+			shipContainer.getChildren().add(ship); // adds ship to the container
+			ship.setViewOrder(-100.0); // ensures the ship is rendered on top
+		}
+
+		root.getChildren().addAll(new Label("Place your ships:"), shipContainer);
+
+		return new Scene(root, 800, 600);
+	}
+
+	private void setupGrid(Pane boardPane) {
+		for (int i = 0; i < 10; i++) {
+			for (int j = 0; j < 10; j++) {
+				Rectangle cell = new Rectangle(30, 30); // create each cell in the grid
+				cell.setFill(Color.LIGHTBLUE);
+				cell.setStroke(Color.BLACK);
+				cell.setX(j * 30); // position cells horizontally
+				cell.setY(i * 30); // position cells vertically
+				boardPane.getChildren().add(cell); // adds cell to the pane
+			}
+		}
+	}
+
+
 	// creates options scene
 	public Scene createOptionsScene(Stage primaryStage){
+		Button playUserBtn = new Button("Play User");
+		Button playAIBtn = new Button("Play AI");
 
-
+		playUserBtn.setOnAction(e -> primaryStage.setScene(sceneMap.get("setUpShipScene")));
+		playAIBtn.setOnAction(e -> primaryStage.setScene(sceneMap.get("setUpShipScene")));
 
 		VBox root = new VBox(40);
 		root.setStyle("-fx-background-color: #F4DAB3; -fx-font-family: 'serif'");
