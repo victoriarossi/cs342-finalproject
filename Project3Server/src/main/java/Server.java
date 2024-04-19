@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Stack;
 import java.util.function.Consumer;
 
 public class Server{
@@ -13,7 +14,7 @@ public class Server{
 	TheServer server;
 //	ArrayList<ArrayList<>>
 	private Consumer<Serializable> callback;
-
+	private Stack<String> userStack = new Stack<>();
 
 	Server(Consumer<Serializable> call){
 	
@@ -51,6 +52,8 @@ public class Server{
 			ObjectOutputStream out;
 
 			String clientName = "";
+			boolean paired = false;
+			boolean firstTurn = false;
 
 
 			ClientThread(Socket s){
@@ -70,26 +73,32 @@ public class Server{
 						Message message = (Message) in.readObject(); // reads next message object from client
 
 						// checks if the message is a username check request
-						if (message.getMessageType() == Message.MessageType.BROADCAST && "checkUser".equals(message.getMessageContent())) {
-							String initialName = message.getUserID();
+						if ("checkUser".equals(message.getMessageContent())) {
+							String initialName = message.getPlayer1();
 							if (!clientID.contains(initialName)) { // checks if username is not already taken
 								clientID.add(initialName);
 								clientName = initialName;
 								callback.accept(clientName + " has connected to server.");
 
 								// notifies all clients of the new user
-								updateClients(new Message("Server", "New User", Message.MessageType.BROADCAST, new ArrayList<>(clientID)));
+								updateClients(new Message("Server", "New User"));
 
 								// sends confirmation to new user that their username is valid
-								out.writeObject(new Message("Server", "Ok Username", Message.MessageType.PRIVATE,new ArrayList<>(clientID)));
+								out.writeObject(new Message("Server", "Ok Username"));
 							} else {
 								// informs client that username is taken
-								out.writeObject(new Message("Server", "Taken Username", Message.MessageType.PRIVATE));
+								out.writeObject(new Message("Server", "Taken Username"));
 							}
 						}
 						else {
 							// forwards any other type of message to all clients
-							updateClients(message);
+//							updateClients(message);
+							if("pair".equals(message.getMessageContent())){
+								pairPlayers(message);
+							} else if("grid".equals(message.getMessageContent())){
+								// a player is playing a move
+
+							}
 						}
 					}
 				}
@@ -105,7 +114,7 @@ public class Server{
 						}
 
 						// notifies all clients that the user left
-						updateClients(new Message("Server", clientName + " has left the chat.", Message.MessageType.BROADCAST, new ArrayList<>(clientID)));
+						updateClients(new Message("Server", clientName + " has left the chat."));
 					}
 					synchronized (clients) {
 						clients.remove(this);
@@ -116,32 +125,45 @@ public class Server{
 			// method to send a message to all clients or specific client
 			public void updateClients(Message message) {
 
-				//  broadcast message to all connected clients
-				if(message.getMessageType() == Message.MessageType.BROADCAST) {
+				// sends a private message to a specific user
+					String user = message.getPlayer1();
+					String enemy = message.getPlayer2();
 					for(ClientThread t : clients) {
-						if(t.clientName != "") {
-							try {
+						try {
+							if(t.clientName.equals(user)) {
+								message.setFirstTurn(true);
 								t.out.writeObject(message);
-							} catch (Exception e) {
-								e.printStackTrace();
+							} else if (t.clientName.equals(enemy)) {
+								Message msg = new Message(enemy, message.getMessageContent(), user);
+								msg.setFirstTurn(false);
+								t.out.writeObject(msg);
 							}
+						} catch (Exception e) {
+							e.printStackTrace();
 						}
 					}
+			}
+
+			public void pairPlayers(Message message){
+				if(message.getMessageContent().contains("pair")){
+					if(!userStack.empty()){
+						String enemy = userStack.pop();
+						if(!enemy.equals(message.getPlayer1())){
+							for(ClientThread t : clients) {
+								if(enemy.equals(t.clientName)){
+									t.paired = true;
+									t.firstTurn = true;
+									updateClients(new Message(message.getPlayer1(), "PAIRED", t.clientName));
+									//t.pair = message.getPlayer1();
+								}
+							}
+						} else {
+							userStack.push(message.getPlayer1());
+						}
+					}
+
 				}
 
-				// sends a private message to a specific user
-				else if (message.getMessageType() == Message.MessageType.PRIVATE) {
-					String recipient = message.getUserIDReceiver();
-					for(ClientThread t : clients) {
-						if(t.clientName.equals(recipient)) {
-							try {
-								t.out.writeObject(message);
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
-						}
-					}
-				}
 			}
 		}//end of client thread
 }

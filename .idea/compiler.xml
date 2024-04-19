@@ -10,9 +10,5 @@
         <module name="Project3Server" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="Project3Client" target="11" />
-      <module name="Project3Server" target="11" />
-    </bytecodeTargetLevel>
   </component>
 </project>

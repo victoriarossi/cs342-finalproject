@@ -4,43 +4,48 @@ import java.util.ArrayList;
 public class Message implements Serializable {
     static final long serialVersionUID = 42L;
 
-    private String userID; // ID of user sending the message
+    private String player1; // ID of player1
+    private String player2;  // ID of player2
+    private boolean playingAI; // boolean to see if we are playing against the AI
     private String messageContent; // content of the message
-    private MessageType messageType; // type of message (BROADCAST = ALL USERS OR PRIVATE = SINGLE USER)
-    private ArrayList<String> listOfUsers; // list of users ID
+//    private MessageType messageType; // type of message (BROADCAST = ALL USERS OR PRIVATE = SINGLE USER)
+    private ArrayList<ArrayList<Character>> player1grid; // grid of boats of player 1. 'W' : water, 'B' : boat, 'H' : hit, 'M' : miss
+    private ArrayList<ArrayList<Character>> player2grid; // grid of boats of player 2
+    // move of the play
+    private int x; // row
+    private int y; // column
     private String userIDReceiver; // ID of user receiving a private message
 
     // Constructor to initialize message object with userID, message content, and type of message
-    public Message(String userID, String messageContent, MessageType messageType) {
-        this.userID = userID;
-        this.messageContent = messageContent;
-        this.messageType = messageType;
+    public Message(String player1, String player2) {
+        this.player1 = player1;
+        this.player2 = player2;
+        this.playingAI = false;
     }
 
-    // Constructor to initialize message object with userID, message content, type of message, and list of users
-    public Message(String userID, String messageContent, MessageType messageType, ArrayList listOfUsers) {
-        this.userID = userID;
-        this.messageContent = messageContent;
-        this.messageType = messageType;
-        this.listOfUsers = listOfUsers;
+    public Message(int x, int y){
+        this.x = x;
+        this.y = y;
     }
-
-    // Constructor to initialize message object with userID, message content, user to send message to
-    public Message(String userIDSender, String messageContent, String userIDReceiver) {
-        this.userID = userIDSender;
-        this.messageContent = messageContent;
-        this.messageType = MessageType.PRIVATE;
-        this.userIDReceiver = userIDReceiver;
-    }
-
     // getter to retrieve userID of the message
-    public String getUserID() {
-        return userID;
+    public String getPlayer1() {
+        return player1;
     }
 
     // setter to set userID of the message
-    public void setUserID(String userID) {
-        this.userID = userID;
+    public void setPlayer1(String userID) {
+        this.player1 = player1;
+    }
+
+    // getter to retrieve userID of the message
+    public String getPlayer2() {
+        return player2;
+    }
+
+
+    // setter to set userID of the message
+    public void setPlayer2(String userID) {
+        this.player2 = player2;
     }
 
     // getter to retrieve message content of the message
@@ -48,35 +53,8 @@ public class Message implements Serializable {
         return messageContent;
     }
 
-    // getter to retrieve message type of the message
-    public MessageType getMessageType() {
-        return messageType;
-    }
-
-    // getter to retrieve clients usernames
-    public ArrayList<String> getListOfUsers(){
-        return listOfUsers;
-    }
-
-    // getter to retrieve the private receiver of message
-    public String getUserIDReceiver() {
-        return userIDReceiver;
-    }
-
-    // enum defining possible types of messages
-    enum MessageType {
-        BROADCAST, // Message for all clients
-        PRIVATE // Message for 1 specific client
-    }
-
     public String toString(){
-        String message = userID + " sent: " + messageContent;
-        if(messageType == MessageType.BROADCAST){
-            message += " to everyone.";
-        } else if(messageType == MessageType.PRIVATE){
-            message += " to you.";
-        }
-        return message;
+        return player1 + messageContent + player2;
     }
 
 }
