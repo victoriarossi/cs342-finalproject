@@ -18,11 +18,11 @@ public class Message implements Serializable {
     private boolean firstTurn;
 
     // Constructor to initialize message object with userID, message content, and type of message
-    public Message(String player1, String player2) {
-        this.player1 = player1;
-        this.player2 = player2;
-        this.playingAI = false;
-    }
+//    public Message(String player1, String player2) {
+//        this.player1 = player1;
+//        this.player2 = player2;
+//        this.playingAI = false;
+//    }
 
     public Message(String player1, String messageContent, String player2){
         this.player1 = player1;

@@ -15,13 +15,22 @@ public class Message implements Serializable {
     private int x; // row
     private int y; // column
     private String userIDReceiver; // ID of user receiving a private message
+    private boolean firstTurn;
 
     // Constructor to initialize message object with userID, message content, and type of message
-    public Message(String player1, String player2) {
+//    public Message(String player1, String player2) {
+//        this.player1 = player1;
+//        this.player2 = player2;
+//        this.playingAI = false;
+//    }
+
+    public Message(String player1, String messageContent, String player2){
         this.player1 = player1;
-        this.player2 = player2;
+        this.messageContent = messageContent;
         this.playingAI = false;
+        this.player2 = player2;
     }
+
 
     public Message(int x, int y){
         this.x = x;
@@ -51,6 +60,16 @@ public class Message implements Serializable {
     // getter to retrieve message content of the message
     public String getMessageContent() {
         return messageContent;
+    }
+
+    // setter to set the first turn
+    public void setFirstTurn(boolean firstTurn){
+        this.firstTurn = firstTurn;
+    }
+
+    // getter to set the first turn
+    public boolean getFirstTurn(){
+        return firstTurn;
     }
 
     public String toString(){

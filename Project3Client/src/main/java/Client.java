@@ -57,7 +57,7 @@ public class Client extends Thread{
 	// sets username for this client and sends a username check request to the server
 	public void setUsername(String username) {
 		this.username = username;
-		Message usernameMsg = new Message(username, "checkUser");
+		Message usernameMsg = new Message(username, "checkUser", null);
 		send(usernameMsg);
 	}
 

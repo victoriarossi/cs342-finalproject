@@ -37,7 +37,7 @@ public class GuiClient extends Application{
 
 	private String selectedUser = "";
 
-	TextField c1;
+	TextField waiting;
 	Button b1;
 	HashMap<String, Scene> sceneMap;
 	Client clientConnection;
@@ -82,19 +82,31 @@ public class GuiClient extends Application{
 					showAlert("Be original, Professor McCarty dislikes copycats!", primaryStage);
 				}
 				else {
-					// if the user leaves, shows the leave message in the chat log and updates the active users list
-					if (msg.getMessageContent().endsWith("has left the chat.")) {
-						//pop up an alert and end game (go back to home page)
-						listItems2.getItems().add(msg.getMessageContent());
-//						updateUserList(msg);
-					}
-					else {
+//					// if the user leaves, shows the leave message in the chat log and updates the active users list
+//					if (msg.getMessageContent().endsWith("has left the chat.")) {
+//						//pop up an alert and end game (go back to home page)
+//						listItems2.getItems().add(msg.getMessageContent());
+////						updateUserList(msg);
+//					}
+//					else {
 
-						if("PAIRED".equals(msg.getMessageContent())){
+						if("Paired".equals(msg.getMessageContent())){
 							enemy = msg.getPlayer2();
 							// go to next sceen
 							primaryStage.setScene(sceneMap.get("mainGame"));
 						}
+						if ("Waiting".equals(msg.getMessageContent())){
+							primaryStage.setScene(sceneMap.get("waitingScene"));
+						} else {
+							System.out.println(msg.getMessageContent());
+							boolean isForCurrentUser = msg.getPlayer2().equals(clientConnection.getUsername());
+							if (isForCurrentUser || msg.getPlayer1().equals(clientConnection.getUsername())) {
+								String privateMsg = "Whisper from " + msg.getPlayer1() + ": " + msg.getMessageContent();
+								listItems2.getItems().add(privateMsg);
+							}
+						}
+
+
 
 						// updates the user list as long as it contains users
 //						if (msg.getListOfUsers() != null) {
@@ -103,14 +115,11 @@ public class GuiClient extends Application{
 
 						// determines if message is private and meant for or from the current user
 //						boolean isPrivate = msg.getMessageType() == Message.MessageType.PRIVATE;
-						boolean isForCurrentUser = msg.getPlayer2().equals(clientConnection.getUsername());
+//						boolean isForCurrentUser = msg.getPlayer2().equals(clientConnection.getUsername());
 
 						// handles the private messages
 //						if (isPrivate) {
-							if (isForCurrentUser || msg.getPlayer1().equals(clientConnection.getUsername())) {
-								String privateMsg = "Whisper from " + msg.getPlayer1() + ": " + msg.getMessageContent();
-								listItems2.getItems().add(privateMsg);
-							}
+//
 //						}
 						// handles non-private messages
 //						else {
@@ -118,7 +127,7 @@ public class GuiClient extends Application{
 //								listItems2.getItems().add(msg.getUserID() + " sent: " + msg.getMessageContent());
 //							}
 //						}
-					}
+//					}
 				}
 			});
 		});
@@ -144,14 +153,13 @@ public class GuiClient extends Application{
 		displayListUsers = new ListView<>();
 		displayListItems = new ListView<>();
 
-		c1 = new TextField(); // input field for messages
 		b1 = new Button("Send"); // send button for messages
 		b1.setOnAction(e->{
-			String messageContent = c1.getText();
+//			String messageContent = c1.getText();
 			String currUsername = clientConnection.getUsername();
-			Message message = new Message(currUsername, messageContent);
+			Message message = new Message(currUsername, messageContent, null);
 			clientConnection.send(message);
-			c1.clear();
+//			c1.clear();
 		});
 
 		// scene map for different scenes
@@ -161,11 +169,12 @@ public class GuiClient extends Application{
 //		sceneMap.put("client",  createClientGui(primaryStage));
 		sceneMap.put("clientLogin", createLoginScene(primaryStage)); // adds login screen to scene map
 		sceneMap.put("options", createOptionsScene(primaryStage)); // adds the options screen to scene map
-//		sceneMap.put("setUpShipScene", createSetUpShipScene(primaryStage));
+		sceneMap.put("setUpShipScene", createSetUpShipScene(primaryStage));
 		sceneMap.put("users", createViewUsersScene(primaryStage)); // adds the view users screen to scene map
 		sceneMap.put("selectUser", createSelectUserScene(primaryStage)); //add the select user screen to scene map
 		sceneMap.put("viewMessages", createViewMessages(primaryStage));
 		sceneMap.put("mainGame", createMainGameScene(primaryStage)); // add the main game screen to scene map
+		sceneMap.put("waitingScene", createWaitingScene(primaryStage));
 
 		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
@@ -175,14 +184,14 @@ public class GuiClient extends Application{
             }
         });
 
-		Scene scene = new Scene(gridPane);
-		primaryStage.setTitle("Battleship Game");
-		primaryStage.setScene(scene);
-		primaryStage.show();
-
-//		primaryStage.setScene(sceneMap.get("startScene")); // starts the scene in the login scene
-//		primaryStage.setTitle("Client");
+//		Scene scene = new Scene(gridPane);
+//		primaryStage.setTitle("Battleship Game");
+//		primaryStage.setScene(scene);
 //		primaryStage.show();
+
+		primaryStage.setScene(sceneMap.get("startScene")); // starts the scene in the login scene
+		primaryStage.setTitle("Client");
+		primaryStage.show();
 	}
 
 	private Button getBackBtn(String scene, Stage primaryStage){
@@ -447,6 +456,12 @@ public class GuiClient extends Application{
 		Pane shipContainer = new Pane(); // container to hold all ships
 		shipContainer.setPrefSize(300, 150);
 
+		Button start = new Button("Start");
+		start.setStyle(btnStyle);
+		start.setOnAction(e -> {
+			clientConnection.send(new Message(currUsername, "Pair", null));
+		});
+
 		setupGrid(shipContainer); // grid setup in ship container
 
 		int xOffset = 10; // initial horizontal offset for first ship
@@ -481,7 +496,7 @@ public class GuiClient extends Application{
 			}
 		});
 
-		HBox layout = new HBox(20, shipContainer, flipButton);
+		HBox layout = new HBox(20, shipContainer, flipButton, start);
 
 		root.getChildren().addAll(new Label("Place your ships:"), layout);
 		BorderPane.setAlignment(backBtn, Pos.TOP_LEFT);
@@ -523,7 +538,9 @@ public class GuiClient extends Application{
 		playAIBtn.setStyle(btnStyle);
 		playAIBtn.setPrefSize(100, 50);
 
-		playUserBtn.setOnAction(e -> primaryStage.setScene(sceneMap.get("setUpShipScene")));
+		playUserBtn.setOnAction(e -> {
+			primaryStage.setScene(sceneMap.get("setUpShipScene"));
+		});
 		playAIBtn.setOnAction(e -> primaryStage.setScene(sceneMap.get("setUpShipScene")));
 
 		VBox root = new VBox(40, playUserBtn, playAIBtn);
@@ -764,6 +781,18 @@ public class GuiClient extends Application{
 		listItems2.setMaxWidth(400);
 		listItems2.setMaxHeight(250);
 		pane.setCenter(vbox);
+
+		return new Scene(pane, 800, 600);
+	}
+
+	private Scene createWaitingScene(Stage primaryStage){
+		BorderPane pane = new BorderPane();
+
+		Color backgroundColor = Color.web("#C7FBFF");
+		pane.setBackground(new Background(new BackgroundFill(backgroundColor, CornerRadii.EMPTY, Insets.EMPTY)));
+
+		Label waiting = new Label("There are no available user, please wait");
+		pane.setCenter(waiting);
 
 		return new Scene(pane, 800, 600);
 	}

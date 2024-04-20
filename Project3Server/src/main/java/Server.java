@@ -81,19 +81,19 @@ public class Server{
 								callback.accept(clientName + " has connected to server.");
 
 								// notifies all clients of the new user
-								updateClients(new Message("Server", "New User"));
+								updateClients(new Message("Server", "New User", null));
 
 								// sends confirmation to new user that their username is valid
-								out.writeObject(new Message("Server", "Ok Username"));
+								out.writeObject(new Message("Server", "Ok Username",  null));
 							} else {
 								// informs client that username is taken
-								out.writeObject(new Message("Server", "Taken Username"));
+								out.writeObject(new Message("Server", "Taken Username", null));
 							}
 						}
 						else {
 							// forwards any other type of message to all clients
 //							updateClients(message);
-							if("pair".equals(message.getMessageContent())){
+							if("Pair".equals(message.getMessageContent())){
 								pairPlayers(message);
 							} else if("grid".equals(message.getMessageContent())){
 								// a player is playing a move
@@ -114,7 +114,7 @@ public class Server{
 						}
 
 						// notifies all clients that the user left
-						updateClients(new Message("Server", clientName + " has left the chat."));
+						updateClients(new Message("Server", clientName + " has left the chat.", null));
 					}
 					synchronized (clients) {
 						clients.remove(this);
@@ -145,25 +145,30 @@ public class Server{
 			}
 
 			public void pairPlayers(Message message){
-				if(message.getMessageContent().contains("pair")){
-					if(!userStack.empty()){
-						String enemy = userStack.pop();
-						if(!enemy.equals(message.getPlayer1())){
-							for(ClientThread t : clients) {
-								if(enemy.equals(t.clientName)){
-									t.paired = true;
-									t.firstTurn = true;
-									updateClients(new Message(message.getPlayer1(), "PAIRED", t.clientName));
-									//t.pair = message.getPlayer1();
-								}
+				if(!userStack.empty()) {
+					String enemy = userStack.pop();
+					if (!enemy.equals(message.getPlayer1())) {
+						for (ClientThread t : clients) {
+							if (enemy.equals(t.clientName)) {
+								t.paired = true;
+								t.firstTurn = true;
+								updateClients(new Message(message.getPlayer1(), "Paired", t.clientName));
+								//t.pair = message.getPlayer1();
 							}
-						} else {
-							userStack.push(message.getPlayer1());
 						}
 					}
-
+				} else {
+					userStack.push(message.getPlayer1());
+					for(ClientThread t : clients) {
+						if (t.clientName.equals(message.getPlayer1())) {
+							try {
+								updateClients(new Message(message.getPlayer1(), "Waiting", null));
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
+					}
 				}
-
 			}
 		}//end of client thread
 }
