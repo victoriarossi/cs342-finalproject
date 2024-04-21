@@ -37,6 +37,8 @@ public class GuiClient extends Application{
 
 	private String selectedUser = "";
 
+	private boolean gameStarted = false;
+
 	TextField waiting;
 	Button b1;
 	HashMap<String, Scene> sceneMap;
@@ -45,12 +47,18 @@ public class GuiClient extends Application{
 	private String messageContent;
 	ListView<String> listItems2;
 	ListView<String> displayListUsers;
+
+	private List<ShipInfo> shipInfos = new ArrayList<>();
 	ListView<String> displayListItems;
 	ObservableList<String> storeUsersInListView;
 
 	private final int size = 10;  // Size of the game board
+
+	ShipInfo currentSelectedShip = null;
+	boolean[][] occupied = new boolean[size][size];
 	private Button[][] buttons = new Button[size][size];  // Buttons array representing the board
 	String currUsername;
+	private boolean isHorizontal = true;
 	String enemy;
 	Button flipButton = new Button("Flip");
 
@@ -132,19 +140,19 @@ public class GuiClient extends Application{
 			});
 		});
 
-		GridPane gridPane = new GridPane();
-
-		for (int x = 0; x < size; x++) {
-			for (int y = 0; y < size; y++) {
-				Button button = new Button();
-				button.setPrefSize(30, 30);  // Set preferred size of each button
-				int finalI = x;
-				int finalJ = y;
-				button.setOnAction(e -> handleButtonAction(finalI, finalJ));
-				buttons[x][y] = button;
-				gridPane.add(button, x, y);
-			}
-		}
+//		GridPane gridPane = new GridPane();
+//
+//		for (int x = 0; x < size; x++) {
+//			for (int y = 0; y < size; y++) {
+//				Button button = new Button();
+//				button.setPrefSize(30, 30);  // Set preferred size of each button
+//				int finalI = x;
+//				int finalJ = y;
+//				button.setOnAction(e -> handleButtonAction(finalI, finalJ));
+//				buttons[x][y] = button;
+//				gridPane.add(button, x, y);
+//			}
+//		}
 
 		clientConnection.start();
 		// initialize lists view
@@ -204,6 +212,7 @@ public class GuiClient extends Application{
 
 		// brings you back to home screen on click
 		backBtn.setOnAction( e -> {
+			resetGrid();
 			primaryStage.setScene(sceneMap.get(scene));
 		});
 		backBtn.setGraphic(homeView);
@@ -432,25 +441,44 @@ public class GuiClient extends Application{
 
 //		return new Scene(pane, 800, 600);
 //	}
-
-	private void setupGrid(Pane boardPane) {
-		for (int i = 0; i < 10; i++) {
-			for (int j = 0; j < 10; j++) {
-				Rectangle cell = new Rectangle(30, 30); // create each cell in the grid
-				cell.setFill(Color.LIGHTBLUE);
-				cell.setStroke(Color.BLACK);
-				cell.setX(j * 30); // position cells horizontally
-				cell.setY(i * 30); // position cells vertically
-				boardPane.getChildren().add(cell); // adds cell to the pane
-			}
-		}
-	}
+//
+//	private void setupGrid(Pane boardPane) {
+//		for (int i = 0; i < 10; i++) {
+//			for (int j = 0; j < 10; j++) {
+//				Rectangle cell = new Rectangle(30, 30); // create each cell in the grid
+//				cell.setFill(Color.LIGHTBLUE);
+//				cell.setStroke(Color.BLACK);
+//				cell.setX(j * 30); // position cells horizontally
+//				cell.setY(i * 30); // position cells vertically
+//				boardPane.getChildren().add(cell); // adds cell to the pane
+//			}
+//		}
+//	}
 
 	public Scene createSetUpShipScene(Stage primaryStage) {
-		List<Rectangle> ships = new ArrayList<>();
-		List<Boolean> isHorizontal = new ArrayList<>();
+//		List<Rectangle> ships = new ArrayList<>();
+//		List<Boolean> isHorizontal = new ArrayList<>();
 
-		BorderPane pane = new BorderPane();
+		
+		GridPane gridPane = new GridPane();
+		gridPane.setAlignment(Pos.TOP_CENTER);
+		gridPane.setHgap(0);
+		gridPane.setVgap(0);
+
+
+		for (int x = 0; x < size; x++) {
+			for (int y = 0; y < size; y++) {
+				Button button = new Button();
+				button.setPrefSize(40, 40);  // Set preferred size of each button
+				int finalI = x;
+				int finalJ = y;
+				button.setOnAction(e -> handleButtonAction(finalI, finalJ));
+				buttons[x][y] = button;
+				gridPane.add(button, x, y);
+			}
+		}
+
+//		BorderPane pane = new BorderPane();
 		Button backBtn = getBackBtn("options", primaryStage);
 		VBox root = new VBox(10);
 		Pane shipContainer = new Pane(); // container to hold all ships
@@ -459,65 +487,138 @@ public class GuiClient extends Application{
 		Button start = new Button("Start");
 		start.setStyle(btnStyle);
 		start.setOnAction(e -> {
+			gameStarted = true;
 			clientConnection.send(new Message(currUsername, "Pair", null));
 		});
 
-		setupGrid(shipContainer); // grid setup in ship container
-
 		int xOffset = 10; // initial horizontal offset for first ship
 		int[] shipLengths = {5, 4, 3, 3, 2}; // all ship lengths
-		for (int length : shipLengths) {
-			Rectangle ship = new Rectangle(length * 30, 30); // creates ship with specific size
-			ship.setFill(Color.GRAY);
-			enableDrag(ship); // enables dragging functionality
-			ship.setX(xOffset); // sets initial x position of ship
-			ship.setY(525); // sets initial y position of ship
-			xOffset += (length * 30) + 10; // increments x offset for next ship
-			shipContainer.getChildren().add(ship); // adds ship to the container
-			ships.add(ship);
-			isHorizontal.add(true);
-			ship.setViewOrder(-100.0); // ensures the ship is rendered on top
-		}
+//		String[] theNames = {""};
+//		String[] shipLengths = {"5", "4", "3", "3", "2"};
+		for (int i = 0; i < shipLengths.length; i++) {
+//			Rectangle ship = new Rectangle(length * 30, 30); // creates ship with specific size
+//			ship.setFill(Color.GRAY);
+//			enableDrag(ship); // enables dragging functionality
+//			ship.setY(100); // sets initial y position of ship
+//			ships.add(ship);
+//			isHorizontal.add(true);
+//			ship.setViewOrder(-100.0); // ensures the ship is rendered on top
+			int length = shipLengths[i];
+			Button shipButton = new Button(String.valueOf(length));
+			shipButton.setPrefSize(length * 30, 30);
+			shipButton.setLayoutX(xOffset);
+			shipButton.setLayoutY(50);
+			ShipInfo shipInfo = new ShipInfo(shipButton, length);
+			shipInfos.add(shipInfo);
+			shipContainer.getChildren().add(shipButton); // adds ship to the container
 
-		flipButton.setOnAction(e -> {
-			// for each ship, toggles it horizontally/vertically
-			for (int i = 0; i < ships.size(); i++) {
-				Rectangle ship = ships.get(i);
-				boolean horizontal = isHorizontal.get(i);
-
-				if (horizontal) {
-					ship.setWidth(30);
-					ship.setHeight(shipLengths[i] * 30);
-				} else {
-					ship.setWidth(shipLengths[i] * 30);
-					ship.setHeight(30);
+			shipButton.setOnAction(e -> {
+				if (!shipInfo.isPlaced) {
+					currentSelectedShip = shipInfo;
 				}
-				isHorizontal.set(i, !horizontal);
-			}
+			});
+
+			xOffset += (length * 30) + 10;
+		}
+		Button horizontalBtn = new Button("Place Horizontally");
+		Button verticalBtn = new Button("Place Vertically");
+
+
+		horizontalBtn.setOnAction(e -> {
+			isHorizontal = true;  // Set placement to horizontal
 		});
 
-		HBox layout = new HBox(20, shipContainer, flipButton, start);
+		verticalBtn.setOnAction(e -> {
+			isHorizontal = false;  // Set placement to vertical
+		});
 
-		root.getChildren().addAll(new Label("Place your ships:"), layout);
-		BorderPane.setAlignment(backBtn, Pos.TOP_LEFT);
-		pane.setTop(backBtn);
+		HBox layout1 = new HBox(10, horizontalBtn, verticalBtn);
 
-		Color backgroundColor = Color.web("#C7FBFF");
-		pane.setBackground(new Background(new BackgroundFill(backgroundColor, CornerRadii.EMPTY, Insets.EMPTY)));
-		pane.setCenter(root);
-		return new Scene(pane, 800, 600);
+		root.getChildren().addAll(new Label("Place your ships:"), layout1, shipContainer, start);
+		BorderPane newPane = new BorderPane();
+		newPane.setCenter(gridPane);
+		newPane.setBottom(root);
+		newPane.setTop(backBtn);
+
+		Scene scene = new Scene(newPane, 800, 600);
+		primaryStage.setTitle("Battleship Game");
+		primaryStage.setScene(scene);
+		primaryStage.show();
+//		return new Scene(pane, 800, 600);
+		return scene;
 	}
 
 
-
-		private void handleButtonAction(int x, int y) {
-			// This is where you will handle the logic for what happens when a button is clicked
-			// For example, attack at (x, y) or place a ship
-			System.out.println("Button clicked at: (" + x + "," + y + ")");
+	private void handleButtonAction(int x, int y) {
+		// This is where you will handle the logic for what happens when a button is clicked
+		// For example, attack at (x, y) or place a ship
+		System.out.println("Button clicked at: (" + x + "," + y + ")");
+		if (gameStarted) {
 			buttons[x][y].setText("X");  // Mark the button as clicked or attacked
 			Message newMsg = new Message(x, y);
 			clientConnection.send(newMsg);
 		}
+		else if (currentSelectedShip != null && !currentSelectedShip.isPlaced) {
+			if (canPlaceShip(x, y, currentSelectedShip)) {
+				placeShipOnGrid(x, y, currentSelectedShip);
+				currentSelectedShip.isPlaced = true;
+				currentSelectedShip.shipButton.setDisable(true);
+			}
+		}
+	}
+
+	private boolean canPlaceShip(int startX, int startY, ShipInfo ship) {
+		if (isHorizontal) {
+			for (int i = 0; i < ship.length; i++) {
+				if (startX + i >= size || occupied[startX + i][startY]) return false;  // Horizontal check
+			}
+		}
+		else {
+			for (int i = 0; i < ship.length; i++) {
+				if (startY + i >= size || occupied[startX][startY + i]) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	private void placeShipOnGrid(int startX, int startY, ShipInfo ship) {
+		String shipLength = String.valueOf(ship.length);
+
+		if (isHorizontal) {
+			for (int i = 0; i < ship.length; i++) {
+				buttons[startX + i][startY].setText(shipLength);  // Mark the button as part of a ship
+				occupied[startX + i][startY] = true;  // Mark cells as occupied
+				buttons[startX + i][startY].setStyle("-fx-background-color: navy; -fx-text-fill: white");
+			}
+		}
+		else {
+			// Place ship vertically
+			for (int i = 0; i < ship.length; i++) {
+				buttons[startX][startY + i].setText(shipLength);  // Mark the grid cell as occupied
+				occupied[startX][startY + i] = true;  // Mark the cell as occupied
+				buttons[startX][startY + i].setStyle("-fx-background-color: navy; -fx-text-fill: white");
+			}
+		}
+	}
+
+	private void resetGrid() {
+		for (int i = 0; i < size; i++) {
+			for (int j = 0; j < size; j++) {
+				buttons[i][j].setText("");  // Clear any text
+				buttons[i][j].setStyle("");  // Reset styles, if any
+				occupied[i][j] = false;  // Reset the occupancy state
+			}
+		}
+
+		for (ShipInfo shipInfo : shipInfos) {
+			shipInfo.shipButton.setDisable(false);
+			shipInfo.shipButton.setStyle("");
+			shipInfo.isPlaced = false;
+		}
+		gameStarted = false;  // Reset game start flag
+	}
 
 
 		//TODO
@@ -808,4 +909,38 @@ public class GuiClient extends Application{
 //				displayListItems.getItems().add(user);
 //		}
 //	}
+
+
+
+
+	//		flipButton.setOnAction(e -> {
+//
+//			// for each ship, toggles it horizontally/vertically
+//			for (int i = 0; i < ships.size(); i++) {
+//
+//				Rectangle ship = ships.get(i);
+//				boolean horizontal = isHorizontal.get(i);
+//
+//				if (horizontal) {
+//					ship.setWidth(shipLengths[i] * 30);
+//					ship.setHeight(30);
+//				} else {
+//					ship.setWidth(30);
+//					ship.setHeight(shipLengths[i] * 30);
+//				}
+//				isHorizontal.set(i, !horizontal);
+//
+//			}
+//		});
+
+	class ShipInfo {
+		Button shipButton;
+		int length;
+		boolean isPlaced = false;
+
+		public ShipInfo(Button shipButton, int length) {
+			this.shipButton = shipButton;
+			this.length = length;
+		}
+	}
 }
