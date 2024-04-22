@@ -59,6 +59,11 @@ public class GuiClient extends Application{
 	private Button[][] buttons = new Button[size][size];  // Buttons array representing the board
 	String currUsername;
 	private boolean isHorizontal = true;
+	private boolean directionClicked = false;
+	Button horizontalBtn;
+	Button verticalBtn;
+	Button start;
+	private int placedShipsCounter = 0;
 	String enemy;
 	Button flipButton = new Button("Flip");
 
@@ -472,7 +477,12 @@ public class GuiClient extends Application{
 				button.setPrefSize(40, 40);  // Set preferred size of each button
 				int finalI = x;
 				int finalJ = y;
-				button.setOnAction(e -> handleButtonAction(finalI, finalJ));
+				button.setOnAction(e -> {
+					handleButtonAction(finalI, finalJ);
+					directionClicked = false;
+					horizontalBtn.setDisable(true);
+					verticalBtn.setDisable(true);
+				});
 				buttons[x][y] = button;
 				gridPane.add(button, x, y);
 			}
@@ -482,14 +492,21 @@ public class GuiClient extends Application{
 		Button backBtn = getBackBtn("options", primaryStage);
 		VBox root = new VBox(10);
 		Pane shipContainer = new Pane(); // container to hold all ships
-		shipContainer.setPrefSize(300, 150);
+		shipContainer.setPrefSize(200, 60);
 
-		Button start = new Button("Start");
+		start = new Button("Start");
 		start.setStyle(btnStyle);
 		start.setOnAction(e -> {
 			gameStarted = true;
 			clientConnection.send(new Message(currUsername, "Pair", null));
 		});
+
+		if(placedShipsCounter != 5){
+			start.setDisable(true);
+		}
+
+		horizontalBtn = new Button("Place Horizontally");
+		verticalBtn = new Button("Place Vertically");
 
 		int xOffset = 10; // initial horizontal offset for first ship
 		int[] shipLengths = {5, 4, 3, 3, 2}; // all ship lengths
@@ -505,9 +522,9 @@ public class GuiClient extends Application{
 //			ship.setViewOrder(-100.0); // ensures the ship is rendered on top
 			int length = shipLengths[i];
 			Button shipButton = new Button(String.valueOf(length));
-			shipButton.setPrefSize(length * 30, 30);
+			shipButton.setPrefSize(length * 30, 20);
 			shipButton.setLayoutX(xOffset);
-			shipButton.setLayoutY(50);
+			shipButton.setLayoutY(20);
 			ShipInfo shipInfo = new ShipInfo(shipButton, length);
 			shipInfos.add(shipInfo);
 			shipContainer.getChildren().add(shipButton); // adds ship to the container
@@ -515,14 +532,14 @@ public class GuiClient extends Application{
 			shipButton.setOnAction(e -> {
 				if (!shipInfo.isPlaced) {
 					currentSelectedShip = shipInfo;
+					directionClicked = true;
+					horizontalBtn.setDisable(false);
+					verticalBtn.setDisable(false);
 				}
 			});
 
 			xOffset += (length * 30) + 10;
 		}
-		Button horizontalBtn = new Button("Place Horizontally");
-		Button verticalBtn = new Button("Place Vertically");
-
 
 		horizontalBtn.setOnAction(e -> {
 			isHorizontal = true;  // Set placement to horizontal
@@ -532,9 +549,22 @@ public class GuiClient extends Application{
 			isHorizontal = false;  // Set placement to vertical
 		});
 
-		HBox layout1 = new HBox(10, horizontalBtn, verticalBtn);
+		if(!directionClicked){
+			horizontalBtn.setDisable(true);
+			verticalBtn.setDisable(true);
+		}
 
-		root.getChildren().addAll(new Label("Place your ships:"), layout1, shipContainer, start);
+		HBox.setMargin(horizontalBtn, new Insets(0, 0, 0, 10)); // Adds 10 pixels of margin to the left of horizontalBtn
+		HBox.setMargin(verticalBtn, new Insets(0, 0, 0, 10)); // Adds 10 pixels of margin to the left of verticalBtn
+		HBox layout1 = new HBox(20, horizontalBtn, verticalBtn);
+
+		Label placeShips = new Label("Place your ships:");
+		placeShips.setStyle(subtitleStyle);
+
+		VBox.setMargin(start, new Insets(0, 0, 0, 10));
+		VBox.setMargin(placeShips, new Insets(0, 0, 0, 10));
+
+		root.getChildren().addAll(placeShips, shipContainer, layout1, start);
 		BorderPane newPane = new BorderPane();
 		newPane.setCenter(gridPane);
 		newPane.setBottom(root);
@@ -563,6 +593,10 @@ public class GuiClient extends Application{
 				placeShipOnGrid(x, y, currentSelectedShip);
 				currentSelectedShip.isPlaced = true;
 				currentSelectedShip.shipButton.setDisable(true);
+				placedShipsCounter++;
+				if(placedShipsCounter == 5){
+					start.setDisable(false);
+				}
 			}
 		}
 	}
