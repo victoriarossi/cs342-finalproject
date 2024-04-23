@@ -31,6 +31,22 @@ public class Message implements Serializable {
         this.player2 = player2;
     }
 
+    public Message(String player1, String messageContent, ArrayList<ArrayList<Character>> grid){
+        this.player1 = player1;
+        this.messageContent = messageContent;
+        this.playingAI = false;
+        this.player2 = player1;
+        this.player1grid = grid;
+    }
+
+    public Message(String player1, String messageContent, String player2, ArrayList<ArrayList<Character>> grid){
+        this.player1 = player1;
+        this.messageContent = messageContent;
+        this.playingAI = false;
+        this.player2 = player1;
+        this.player1grid = grid;
+    }
+
 
     public Message(int x, int y){
         this.x = x;
@@ -70,6 +86,26 @@ public class Message implements Serializable {
     // getter to set the first turn
     public boolean getFirstTurn(){
         return firstTurn;
+    }
+
+    // getter to get player 1's grid
+    public ArrayList<ArrayList<Character>> getPlayer1grid() {
+        return player1grid;
+    }
+
+    // getter to get player 2's grid
+    public ArrayList<ArrayList<Character>> getPlayer2grid() {
+        return player2grid;
+    }
+
+    // getter to get x position of players move
+    public int getX(){
+        return x;
+    }
+
+    // getter to get y position of players move
+    public int getY(){
+        return y;
     }
 
     public String toString(){

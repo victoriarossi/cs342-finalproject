@@ -54,6 +54,7 @@ public class Server{
 			String clientName = "";
 			boolean paired = false;
 			boolean firstTurn = false;
+			ArrayList<ArrayList<Character>> grid;
 
 
 			ClientThread(Socket s){
@@ -81,23 +82,24 @@ public class Server{
 								callback.accept(clientName + " has connected to server.");
 
 								// notifies all clients of the new user
-								updateClients(new Message("Server", "New User", null));
+								updateClients(new Message("Server", "New User", ""));
 
 								// sends confirmation to new user that their username is valid
-								out.writeObject(new Message("Server", "Ok Username",  null));
+								out.writeObject(new Message("Server", "Ok Username",  ""));
 							} else {
 								// informs client that username is taken
-								out.writeObject(new Message("Server", "Taken Username", null));
+								out.writeObject(new Message("Server", "Taken Username", ""));
 							}
 						}
 						else {
 							// forwards any other type of message to all clients
 //							updateClients(message);
 							if("Pair".equals(message.getMessageContent())){
+								System.out.println(message.getPlayer1grid());
 								pairPlayers(message);
-							} else if("grid".equals(message.getMessageContent())){
+							} else if("Grid".equals(message.getMessageContent())){
 								// a player is playing a move
-
+								playMove(message);
 							}
 						}
 					}
@@ -114,7 +116,7 @@ public class Server{
 						}
 
 						// notifies all clients that the user left
-						updateClients(new Message("Server", clientName + " has left the chat.", null));
+						updateClients(new Message("Server", clientName + " has left the chat.", ""));
 					}
 					synchronized (clients) {
 						clients.remove(this);
@@ -132,9 +134,12 @@ public class Server{
 						try {
 							if(t.clientName.equals(user)) {
 								message.setFirstTurn(true);
-								t.out.writeObject(message);
+								System.out.println("Sending: " + message.getMessageContent() + " to " + user);
+								t.grid = message.getPlayer1grid();
+								t.out.writeObject(new Message(message, message.getPlayer1grid()));
 							} else if (t.clientName.equals(enemy)) {
-								Message msg = new Message(enemy, message.getMessageContent(), user);
+								System.out.println("Sending: " + message.getMessageContent() + " to " + enemy);
+								Message msg = new Message(enemy, message.getMessageContent(), user, message.getPlayer1grid());
 								msg.setFirstTurn(false);
 								t.out.writeObject(msg);
 							}
@@ -152,7 +157,7 @@ public class Server{
 							if (enemy.equals(t.clientName)) {
 								t.paired = true;
 								t.firstTurn = true;
-								updateClients(new Message(message.getPlayer1(), "Paired", t.clientName));
+								updateClients(new Message(message.getPlayer1(), "Paired", t.clientName, message.getPlayer1grid()));
 								//t.pair = message.getPlayer1();
 							}
 						}
@@ -162,10 +167,24 @@ public class Server{
 					for(ClientThread t : clients) {
 						if (t.clientName.equals(message.getPlayer1())) {
 							try {
-								updateClients(new Message(message.getPlayer1(), "Waiting", null));
+								updateClients(new Message(message.getPlayer1(), "Waiting", ""));
 							} catch (Exception e) {
 								e.printStackTrace();
 							}
+						}
+					}
+				}
+			}
+
+			public void playMove(Message message){
+				for(ClientThread t : clients) {
+					if(t.clientName.equals(message.getPlayer2())){
+						if(t.grid.get(message.getX()).get(message.getY()) == 'B'){
+							t.grid.get(message.getX()).set(message.getY(), 'H');
+							updateClients(new Message(message.getPlayer1(), "Hit",message.getPlayer2()));
+						} else if(t.grid.get(message.getX()).get(message.getY()) == 'W'){
+							t.grid.get(message.getX()).set(message.getY(), 'M');
+							updateClients(new Message(message.getPlayer1(), "Miss",message.getPlayer2()));
 						}
 					}
 				}

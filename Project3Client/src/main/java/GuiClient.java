@@ -1,3 +1,4 @@
+import java.awt.*;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
@@ -51,12 +52,17 @@ public class GuiClient extends Application{
 	private List<ShipInfo> shipInfos = new ArrayList<>();
 	ListView<String> displayListItems;
 	ObservableList<String> storeUsersInListView;
+	private ArrayList<ArrayList<Character>> grid;
+	private ArrayList<ArrayList<Character>> enemyGrid;
+	private int xMove;
+	private int yMove;
 
 	private final int size = 10;  // Size of the game board
 
 	ShipInfo currentSelectedShip = null;
 	boolean[][] occupied = new boolean[size][size];
 	private Button[][] buttons = new Button[size][size];  // Buttons array representing the board
+	private Button[][] buttons2 = new Button[size][size];  // Buttons array representing the board
 	String currUsername;
 	private boolean isHorizontal = true;
 	private boolean directionClicked = false;
@@ -102,16 +108,25 @@ public class GuiClient extends Application{
 ////						updateUserList(msg);
 //					}
 //					else {
-
 						if("Paired".equals(msg.getMessageContent())){
 							enemy = msg.getPlayer2();
-							// go to next sceen
-							primaryStage.setScene(sceneMap.get("mainGame"));
+							ArrayList<ArrayList<Character>> newGrid = new ArrayList<>();
+							for (int i = 0; i < size; i++) {
+								ArrayList<Character> row = new ArrayList<>();
+								for (int j = 0; j < size; j++) {
+									row.add(msg.getPlayer1grid().get(i).get(j)); // Replace defaultValue with the default value you want to initialize the grid with
+								}
+								newGrid.add(row);
+							}
+							grid.addAll(newGrid);
+							// go to next scene
+							System.out.println(grid);
+							createuserVSUserScene(primaryStage, grid);
 						}
-						if ("Waiting".equals(msg.getMessageContent())){
+						if ("Waiting".equals(msg.getMessageContent()) && msg.getPlayer1().equals(currUsername)){
+//							System.out.println(grid);
 							primaryStage.setScene(sceneMap.get("waitingScene"));
 						} else {
-							System.out.println(msg.getMessageContent());
 							boolean isForCurrentUser = msg.getPlayer2().equals(clientConnection.getUsername());
 							if (isForCurrentUser || msg.getPlayer1().equals(clientConnection.getUsername())) {
 								String privateMsg = "Whisper from " + msg.getPlayer1() + ": " + msg.getMessageContent();
@@ -119,6 +134,13 @@ public class GuiClient extends Application{
 							}
 						}
 
+						if("Hit".equals(msg.getMessageContent())){
+							//update enemy's grid
+							enemyGrid.get(xMove).set(yMove, 'H');
+						} else if("Miss".equals(msg.getMessageContent())){
+							//update enemy's grid
+							enemyGrid.get(xMove).set(yMove, 'M');
+						}
 
 
 						// updates the user list as long as it contains users
@@ -170,10 +192,23 @@ public class GuiClient extends Application{
 		b1.setOnAction(e->{
 //			String messageContent = c1.getText();
 			String currUsername = clientConnection.getUsername();
-			Message message = new Message(currUsername, messageContent, null);
+			Message message = new Message(currUsername, messageContent, "");
 			clientConnection.send(message);
 //			c1.clear();
 		});
+
+		// initialize user's grid and enemy's grid with only water
+		grid = new ArrayList<>(size);
+		enemyGrid = new ArrayList<>(size);
+		for(int i = 0; i < size; i++){
+			grid.add(new ArrayList<>());
+			enemyGrid.add(new ArrayList<>());
+			for(int j = 0; j < size; j++){
+				grid.get(i).add('W');
+				enemyGrid.get(i).add('W');
+			}
+		}
+
 
 		// scene map for different scenes
 		sceneMap = new HashMap<String, Scene>();
@@ -186,7 +221,7 @@ public class GuiClient extends Application{
 		sceneMap.put("users", createViewUsersScene(primaryStage)); // adds the view users screen to scene map
 		sceneMap.put("selectUser", createSelectUserScene(primaryStage)); //add the select user screen to scene map
 		sceneMap.put("viewMessages", createViewMessages(primaryStage));
-		sceneMap.put("mainGame", createMainGameScene(primaryStage)); // add the main game screen to scene map
+//		sceneMap.put("userVSUser", createuserVSUserScene(primaryStage)); // add the main game screen to scene map
 		sceneMap.put("waitingScene", createWaitingScene(primaryStage));
 
 		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
@@ -498,7 +533,8 @@ public class GuiClient extends Application{
 		start.setStyle(btnStyle);
 		start.setOnAction(e -> {
 			gameStarted = true;
-			clientConnection.send(new Message(currUsername, "Pair", null));
+			System.out.println("Start clicked");
+			clientConnection.send(new Message(currUsername, "Pair", grid));
 		});
 
 		if(placedShipsCounter != 5){
@@ -619,12 +655,12 @@ public class GuiClient extends Application{
 
 	private void placeShipOnGrid(int startX, int startY, ShipInfo ship) {
 		String shipLength = String.valueOf(ship.length);
-
 		if (isHorizontal) {
 			for (int i = 0; i < ship.length; i++) {
 				buttons[startX + i][startY].setText(shipLength);  // Mark the button as part of a ship
 				occupied[startX + i][startY] = true;  // Mark cells as occupied
 				buttons[startX + i][startY].setStyle("-fx-background-color: navy; -fx-text-fill: white");
+				grid.get(startY).set(startX + i, 'B');
 			}
 		}
 		else {
@@ -633,6 +669,7 @@ public class GuiClient extends Application{
 				buttons[startX][startY + i].setText(shipLength);  // Mark the grid cell as occupied
 				occupied[startX][startY + i] = true;  // Mark the cell as occupied
 				buttons[startX][startY + i].setStyle("-fx-background-color: navy; -fx-text-fill: white");
+				grid.get(startY + i).set(startX, 'B');
 			}
 		}
 	}
@@ -655,12 +692,64 @@ public class GuiClient extends Application{
 	}
 
 
-		//TODO
-	private Scene createMainGameScene(Stage primaryStage) {
-		VBox root = new VBox(40);
-		root.setStyle("-fx-background-color: #C7FBFF; -fx-font-family: 'serif'");
+	private void createuserVSUserScene(Stage primaryStage, ArrayList<ArrayList<Character>> grid) {
+
+		HBox root = new HBox(20);
+
+//		root.setStyle("-fx-background-color: #C7FBFF; -fx-font-family: 'serif'");
+
+		GridPane gridPane = new GridPane();
+		gridPane.setAlignment(Pos.TOP_CENTER);
+		gridPane.setHgap(0);
+		gridPane.setVgap(0);
+
+		for (int x = 0; x < size; x++) {
+			for (int y = 0; y < size; y++) {
+				Button button = new Button();
+				System.out.println(grid.get(x).get(y));
+				if(grid.get(x).get(y).equals('B')) {
+
+					button.setStyle("-fx-background-color: #000000;");
+				} else {
+					button.setStyle("-fx-background-color: #6F6F6F;");
+				}
+				button.setPrefSize(40, 40);  // Set preferred size of each button
+				int finalI = x;
+				int finalJ = y;
+				button.setOnAction(e -> {
+					handleButtonAction(finalI, finalJ);
+				});
+				button.setDisable(true);
+				buttons2[x][y] = button;
+				gridPane.add(button, x, y);
+			}
+		}
+
+//		GridPane grid2Pane = new GridPane();
+//		grid2Pane.setAlignment(Pos.TOP_CENTER);
+//		grid2Pane.setHgap(0);
+//		grid2Pane.setVgap(0);
+//
+//		for (int x = 0; x < size; x++) {
+//			for (int y = 0; y < size; y++) {
+//				Rectangle box = new Rectangle(x * 40, y * 40, 40, 40);
+//				if(enemyGrid.get(x).get(y) == 'B'){
+//					box.setFill(Color.BLACK);
+//				} else if(enemyGrid.get(x).get(y) == 'M'){
+//					box.setFill(Color.GRAY);
+//				} else if(enemyGrid.get(x).get(y) == 'W'){
+//					box.setFill(Color.BLUE);
+//				} else {
+//					box.setFill(Color.RED);
+//				}
+//				grid2Pane.add(box, x, y);
+//			}
+//		}
+//
+		root.getChildren().addAll(gridPane);
 		root.setAlignment(Pos.CENTER);
-		return new Scene(root, 800, 600);
+//		return new Scene(root, 800, 600);
+		primaryStage.setScene(new Scene(root, 800, 600));
 	}
 
 
@@ -926,7 +1015,7 @@ public class GuiClient extends Application{
 		Color backgroundColor = Color.web("#C7FBFF");
 		pane.setBackground(new Background(new BackgroundFill(backgroundColor, CornerRadii.EMPTY, Insets.EMPTY)));
 
-		Label waiting = new Label("There are no available user, please wait");
+		Label waiting = new Label("There are no available users, please wait...");
 		pane.setCenter(waiting);
 
 		return new Scene(pane, 800, 600);

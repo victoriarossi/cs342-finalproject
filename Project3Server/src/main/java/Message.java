@@ -1,5 +1,6 @@
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Message implements Serializable {
     static final long serialVersionUID = 42L;
@@ -29,6 +30,30 @@ public class Message implements Serializable {
         this.messageContent = messageContent;
         this.playingAI = false;
         this.player2 = player2;
+    }
+
+    public Message(String player1, String messageContent, ArrayList<ArrayList<Character>> grid){
+        this.player1 = player1;
+        this.messageContent = messageContent;
+        this.playingAI = false;
+        this.player2 = player1;
+        this.player1grid = grid;
+    }
+
+    public Message(String player1, String messageContent, String player2, ArrayList<ArrayList<Character>> grid){
+        this.player1 = player1;
+        this.messageContent = messageContent;
+        this.playingAI = false;
+        this.player2 = player1;
+        this.player1grid = grid;
+    }
+
+    public Message(Message message, ArrayList<ArrayList<Character>> grid){
+        this.player1 = message.player1;
+        this.messageContent = message.messageContent;
+        this.playingAI = message.playingAI;
+        this.player2 = message.player2;
+        this.player1grid = grid;
     }
 
     public Message(int x, int y){
@@ -69,6 +94,26 @@ public class Message implements Serializable {
     // getter to set the first turn
     public boolean getFirstTurn(){
         return firstTurn;
+    }
+
+    // getter to get player 1's grid
+    public ArrayList<ArrayList<Character>> getPlayer1grid() {
+        return player1grid;
+    }
+
+    // getter to get player 2's grid
+    public ArrayList<ArrayList<Character>> getPlayer2grid() {
+        return player2grid;
+    }
+
+    // getter to get x position of players move
+    public int getX(){
+        return x;
+    }
+
+    // getter to get y position of players move
+    public int getY(){
+        return y;
     }
 
     public String toString(){
