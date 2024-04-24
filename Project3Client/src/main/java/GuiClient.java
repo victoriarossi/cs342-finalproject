@@ -1,27 +1,22 @@
-import java.awt.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Random;
 
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableArray;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -67,14 +62,23 @@ public class GuiClient extends Application{
 	String currUsername;
 	private boolean isHorizontal = true;
 	private boolean directionClicked = false;
+
+	GridPane gridPaneEnemy = new GridPane();
 	Button horizontalBtn;
 	Button verticalBtn;
 	Button start;
+
+	int buttonsClickedCount = 0;
 	private int placedShipsCounter = 0;
 	String enemy;
 	Boolean myTurn = false;
 	Button flipButton = new Button("Flip");
 	Button hit;
+
+	private Button lastSelectedButton = null;
+	private int lastSelectedX = -1;
+	private int lastSelectedY = -1;
+
 
 
 	// styling strings for different UI
@@ -130,7 +134,7 @@ public class GuiClient extends Application{
 							grid.addAll(newGrid);
 							// go to next scene
 							System.out.println(grid);
-							createuserVSUserScene(primaryStage, grid);
+							createUserVSUserScene(primaryStage, grid);
 						}
 						if ("Waiting".equals(msg.getMessageContent()) && msg.getPlayer1().equals(currUsername)){
 //							System.out.println(grid);
@@ -498,7 +502,7 @@ public class GuiClient extends Application{
 	}
 
 
-	private void createuserVSUserScene(Stage primaryStage, ArrayList<ArrayList<Character>> grid) {
+	private void createUserVSUserScene(Stage primaryStage, ArrayList<ArrayList<Character>> grid) {
 
 		HBox root = new HBox(20);
 
@@ -512,6 +516,7 @@ public class GuiClient extends Application{
 		for (int x = 0; x < size; x++) {
 			for (int y = 0; y < size; y++) {
 				Button button = new Button();
+
 //				System.out.println(grid.get(x).get(y));
 				if(grid.get(x).get(y).equals('B')) {
 					button.setStyle("-fx-background-color: #000000;");
@@ -519,18 +524,22 @@ public class GuiClient extends Application{
 					button.setStyle("-fx-background-color: #77BAFC;");
 				}
 				button.setPrefSize(40, 40);  // Set preferred size of each button
+				button.setDisable(true);
 				int finalI = x;
 				int finalJ = y;
 				button.setOnAction(e -> {
-					handleButtonAction(finalI, finalJ);
+					System.out.println("Counter Before Click: " + buttonsClickedCount);
+					if (buttonsClickedCount < 1) {
+						handleGridClick(finalI, finalJ);
+						button.setDisable(true);
+						buttonsClickedCount++;
+					}
 				});
-				button.setDisable(true);
 				buttons2[x][y] = button;
 				gridPane.add(button, y,  x);
 			}
 		}
 
-		GridPane gridPaneEnemy = new GridPane();
 		gridPaneEnemy.setAlignment(Pos.TOP_CENTER);
 		gridPaneEnemy.setHgap(0);
 		gridPaneEnemy.setVgap(0);
@@ -549,9 +558,14 @@ public class GuiClient extends Application{
 				button.setPrefSize(40, 40);  // Set preferred size of each button
 				int finalI = x;
 				int finalJ = y;
+
 				button.setOnAction(e -> {
-					handleGridClick(finalI, finalJ);
-//					clientConnection.send(new Message("Move", currUsername, enemy, finalI, finalJ, true));
+					System.out.println("Counter Enemy: " + buttonsClickedCount);
+					if (buttonsClickedCount < 1) {
+						handleGridClick(finalI, finalJ);
+						button.setDisable(true);
+						buttonsClickedCount++;
+					}
 				});
 				buttons2Enemy[x][y] = button;
 				gridPaneEnemy.add(button, y,  x);
@@ -561,17 +575,19 @@ public class GuiClient extends Application{
 		// TODO: This is the hit button. When the user presses it we send messageContent "PlayTurn"
 		// This message will also contain the x and y coord for the server to check if the user hit another ship or not
 		// IE the clientThread.grid's ship.
-		if(myTurn){
-			hit.setDisable(false);
-		} else {
-			hit.setDisable(true);
-		}
 		//TODO: make sure that the user cannot send empty hit
 		hit.setStyle(btnStyle);
 		hit.setOnAction( e -> {
-			hit.setDisable(true);
-//			clientConnection.send(new Message("PlayTurn", enemy));
-			clientConnection.send(new Message("Move", currUsername, enemy, xMove, yMove, false));
+			// HRISTIAN CHANGE.
+			Platform.runLater(() -> {
+				buttonsClickedCount = 0;
+						hit.setDisable(true);
+						clientConnection.send(new Message("Move", currUsername, enemy, xMove, yMove, false));
+			//			clientConnection.send(new Message("PlayTurn", enemy));
+				}
+
+				);
+
 		});
 
 		BorderPane pane = new BorderPane();
