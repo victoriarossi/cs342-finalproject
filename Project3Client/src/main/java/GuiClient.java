@@ -657,6 +657,7 @@ public class GuiClient extends Application{
 		String shipLength = String.valueOf(ship.length);
 		if (isHorizontal) {
 			for (int i = 0; i < ship.length; i++) {
+
 				buttons[startX + i][startY].setText(shipLength);  // Mark the button as part of a ship
 				occupied[startX + i][startY] = true;  // Mark cells as occupied
 				buttons[startX + i][startY].setStyle("-fx-background-color: navy; -fx-text-fill: white");
@@ -721,7 +722,7 @@ public class GuiClient extends Application{
 				});
 				button.setDisable(true);
 				buttons2[x][y] = button;
-				gridPane.add(button, x, y);
+				gridPane.add(button, y,  x);
 			}
 		}
 
