@@ -14,7 +14,7 @@ public class Server{
 	TheServer server;
 //	ArrayList<ArrayList<>>
 	private Consumer<Serializable> callback;
-	private Stack<String> userStack = new Stack<>();
+	private Stack<UserInfo> userStack = new Stack<>();
 
 	Server(Consumer<Serializable> call){
 	
@@ -54,7 +54,7 @@ public class Server{
 			String clientName = "";
 			boolean paired = false;
 			boolean firstTurn = false;
-			ArrayList<ArrayList<Character>> grid;
+			ArrayList<ArrayList<Character>> grid = new ArrayList<>();
 
 
 			ClientThread(Socket s){
@@ -95,7 +95,7 @@ public class Server{
 							// forwards any other type of message to all clients
 //							updateClients(message);
 							if("Pair".equals(message.getMessageContent())){
-								System.out.println(message.getPlayer1grid());
+//								System.out.println(message.getPlayer1grid());
 								pairPlayers(message);
 							} else if("Grid".equals(message.getMessageContent())){
 								// a player is playing a move
@@ -130,6 +130,7 @@ public class Server{
 				// sends a private message to a specific user
 					String user = message.getPlayer1();
 					String enemy = message.getPlayer2();
+					System.out.println(message.getMessageContent() + " to " + user + " and " + enemy);
 					for(ClientThread t : clients) {
 						try {
 							if(t.clientName.equals(user)) {
@@ -151,19 +152,32 @@ public class Server{
 
 			public void pairPlayers(Message message){
 				if(!userStack.empty()) {
-					String enemy = userStack.pop();
-					if (!enemy.equals(message.getPlayer1())) {
+					UserInfo enemy = userStack.pop();
+//					System.out.println("user: " + message.getPlayer1() + " enemy: " + enemy.getUsername());
+					if (!enemy.getUsername().equals(message.getPlayer1())) {
+						// go over the threads and look for the enemy's thread
 						for (ClientThread t : clients) {
-							if (enemy.equals(t.clientName)) {
+							if (enemy.getUsername().equals(t.clientName)) {
 								t.paired = true;
 								t.firstTurn = true;
-								updateClients(new Message(message.getPlayer1(), "Paired", t.clientName, message.getPlayer1grid()));
-								//t.pair = message.getPlayer1();
+//								System.out.println(t.clientName + "'s Grid on thread " +  enemy.getGrid());
+								Message msg = new Message(enemy.getUsername(), "Paired", message.getPlayer1(), enemy.getGrid());
+								try {
+									t.out.writeObject(msg);
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+							} else if (message.getPlayer1().equals(t.clientName)) { // look for my thread
+								try {
+									t.out.writeObject(new Message(message.getPlayer1(), "Paired", enemy.getUsername(), message.getPlayer1grid()));
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
 							}
 						}
 					}
 				} else {
-					userStack.push(message.getPlayer1());
+					userStack.push(new UserInfo(message.getPlayer1(), message.getPlayer1grid()));
 					for(ClientThread t : clients) {
 						if (t.clientName.equals(message.getPlayer1())) {
 							try {
@@ -192,4 +206,3 @@ public class Server{
 		}//end of client thread
 }
 
-	
