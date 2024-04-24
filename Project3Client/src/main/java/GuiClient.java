@@ -114,6 +114,11 @@ public class GuiClient extends Application{
 						if("Paired".equals(msg.getMessageContent())){
 							enemy = msg.getPlayer2();
 							myTurn = msg.getMyTurn();
+							if(myTurn){
+								hit.setDisable(false);
+							} else {
+								hit.setDisable(true);
+							}
 							ArrayList<ArrayList<Character>> newGrid = new ArrayList<>();
 							for (int i = 0; i < size; i++) {
 								ArrayList<Character> row = new ArrayList<>();
@@ -142,60 +147,27 @@ public class GuiClient extends Application{
 							//update enemy's grid
 							enemyGrid.get(msg.getX()).set(msg.getY(), 'H');
 							myTurn = msg.getMyTurn();
+							if(myTurn){
+								hit.setDisable(false);
+							} else {
+								hit.setDisable(true);
+							}
+//							primaryStage.setScene("")
 
 						} else if("Miss".equals(msg.getMessageContent())){
 							//update enemy's grid
 							enemyGrid.get(msg.getX()).set(msg.getY(), 'M');
 							myTurn = msg.getMyTurn();
-						}
-						// TODO: here we need to receive a message from the server and enable the button back.
-						// That is when an enemy presses the hit button we need to deal with what happens
-						// Tell the user if they were hit and re-enable the button.
-						else if("PlayTurn".equals(msg.getMessageContent())) {
-							if (myTurn) {
+							if(myTurn){
 								hit.setDisable(false);
 							} else {
 								hit.setDisable(true);
 							}
 						}
 
-						// updates the user list as long as it contains users
-//						if (msg.getListOfUsers() != null) {
-//							updateUserList(msg);
-//						}
-
-						// determines if message is private and meant for or from the current user
-//						boolean isPrivate = msg.getMessageType() == Message.MessageType.PRIVATE;
-//						boolean isForCurrentUser = msg.getPlayer2().equals(clientConnection.getUsername());
-
-						// handles the private messages
-//						if (isPrivate) {
-//
-//						}
-						// handles non-private messages
-//						else {
-//							if (!"New User".equals(msg.getMessageContent())) {
-//								listItems2.getItems().add(msg.getUserID() + " sent: " + msg.getMessageContent());
-//							}
-//						}
-//					}
 				}
 			});
 		});
-
-//		GridPane gridPane = new GridPane();
-//
-//		for (int x = 0; x < size; x++) {
-//			for (int y = 0; y < size; y++) {
-//				Button button = new Button();
-//				button.setPrefSize(30, 30);  // Set preferred size of each button
-//				int finalI = x;
-//				int finalJ = y;
-//				button.setOnAction(e -> handleButtonAction(finalI, finalJ));
-//				buttons[x][y] = button;
-//				gridPane.add(button, x, y);
-//			}
-//		}
 
 		clientConnection.start();
 		// initialize lists view
@@ -203,15 +175,6 @@ public class GuiClient extends Application{
 		storeUsersInListView = FXCollections.observableArrayList();
 		displayListUsers = new ListView<>();
 		displayListItems = new ListView<>();
-
-		b1 = new Button("Send"); // send button for messages
-		b1.setOnAction(e->{
-//			String messageContent = c1.getText();
-			String currUsername = clientConnection.getUsername();
-			Message message = new Message(currUsername, messageContent, "");
-			clientConnection.send(message);
-//			c1.clear();
-		});
 
 		// initialize user's grid and enemy's grid with only water
 		grid = new ArrayList<>(size);
@@ -225,6 +188,8 @@ public class GuiClient extends Application{
 			}
 		}
 
+		hit = new Button("Hit");
+
 
 		// scene map for different scenes
 		sceneMap = new HashMap<String, Scene>();
@@ -235,8 +200,6 @@ public class GuiClient extends Application{
 		sceneMap.put("options", createOptionsScene(primaryStage)); // adds the options screen to scene map
 		sceneMap.put("setUpShipScene", createSetUpShipScene(primaryStage));
 		sceneMap.put("users", createViewUsersScene(primaryStage)); // adds the view users screen to scene map
-		sceneMap.put("selectUser", createSelectUserScene(primaryStage)); //add the select user screen to scene map
-		sceneMap.put("viewMessages", createViewMessages(primaryStage));
 //		sceneMap.put("userVSUser", createuserVSUserScene(primaryStage)); // add the main game screen to scene map
 		sceneMap.put("waitingScene", createWaitingScene(primaryStage));
 
@@ -248,17 +211,12 @@ public class GuiClient extends Application{
             }
         });
 
-//		Scene scene = new Scene(gridPane);
-//		primaryStage.setTitle("Battleship Game");
-//		primaryStage.setScene(scene);
-//		primaryStage.show();
-
 		primaryStage.setScene(sceneMap.get("startScene")); // starts the scene in the login scene
 		primaryStage.setTitle("Client");
 		primaryStage.show();
 	}
 
-	private Button getBackBtn(String scene, Stage primaryStage){
+	public Button getBackBtn(String scene, Stage primaryStage){
 		// Create back button
 		Image home = new Image("back_arrow.png");
 		ImageView homeView = new ImageView(home);
@@ -276,6 +234,7 @@ public class GuiClient extends Application{
 
 		return backBtn;
 	}
+
 
 	// creates the initial login scene
 	private Scene createLoginScene(Stage primaryStage) {
@@ -319,79 +278,6 @@ public class GuiClient extends Application{
 		return new Scene(pane,800, 600);
 	}
 
-	// creates main client UI
-//	public Scene createClientGui(Stage primaryStage) {
-//		BorderPane pane =  new BorderPane();
-//
-//		// sets and styles the title of the send message screen
-//		Label title = new Label("Input your message:");
-//		title.setStyle(subtitleStyle + "; -fx-padding: 10");
-//
-//		messageTextField = new TextField();
-//		messageTextField.setMaxWidth(250);
-//		messageTextField.setStyle("-fx-padding: 10; -fx-background-radius: 25px;");
-//
-//		// label to show the recipient of the message
-//		Label sendTo = new Label("Send to: ");
-//		sendTo.setStyle(subtitleStyle);
-//
-//		// creates the buttons to send to all or 1 user
-//		Button allUsers = new Button("All users");
-//		Button oneUser = new Button("One user");
-//		allUsers.setStyle(btnStyle);
-//		oneUser.setStyle(btnStyle);
-//		HBox btns = new HBox(20, allUsers, oneUser);
-//		btns.setAlignment(Pos.CENTER);
-//
-//		// handles on click event for the all users button
-//		allUsers.setOnAction( e -> {
-//			String messageContent = messageTextField.getText();
-//			String currUsername = clientConnection.getUsername();
-//			Message msg = new Message(currUsername, messageContent, Message.MessageType.BROADCAST);
-//			clientConnection.send(msg);
-//			messageTextField.clear();
-//		});
-//
-//		// handles on click event for sending to 1 user button
-//		oneUser.setOnAction(e -> {
-//			messageContent = messageTextField.getText();
-//			primaryStage.setScene(sceneMap.get("selectUser"));
-//		});
-//
-//		// disables sending buttons if message field is empty
-//		allUsers.disableProperty().bind(messageTextField.textProperty().isEmpty());
-//		oneUser.disableProperty().bind(messageTextField.textProperty().isEmpty());
-//
-//		// Create back button
-//		Image home = new Image("back_arrow.png");
-//		ImageView homeView = new ImageView(home);
-//		homeView.setFitHeight(15);
-//		homeView.setFitWidth(15);
-//		Button backBtn = new Button();
-//
-//		// brings you back to options screen on click
-//		backBtn.setOnAction( e -> {
-//			primaryStage.setScene(sceneMap.get("options"));
-//		});
-//		backBtn.setGraphic(homeView);
-//		backBtn.setStyle(btnStyle.concat("-fx-font-size: 14; -fx-padding: 10; -fx-background-radius: 25px; -fx-cursor: hand"));
-//
-//		BorderPane.setAlignment(backBtn, Pos.TOP_LEFT);
-//		pane.setTop(backBtn);
-//		Color backgroundColor = Color.web("#C7FBFF");
-//		pane.setBackground(new Background(new BackgroundFill(backgroundColor, CornerRadii.EMPTY, Insets.EMPTY)));
-//
-//		// container for all main controls
-//		clientBox = new VBox(20, title, messageTextField, sendTo, btns, listItems2);
-//		clientBox.setStyle("-fx-background-color: #F4DAB3; -fx-font-family: 'serif'");
-//		VBox.setMargin(clientBox, new Insets(30));
-//		clientBox.setAlignment(Pos.CENTER);
-//
-//		pane.setCenter(clientBox); // sets the VBox as the central content of the BorderPane
-//
-//		return new Scene(pane,800, 600);
-//	}
-
 
 	// shows popup for invalid usernames
 	private void showAlert(String message, Stage primaryStage) {
@@ -420,101 +306,7 @@ public class GuiClient extends Application{
 		primaryStage.show();
 	}
 
-	private void enableDrag(Rectangle ship) {
-		final offset drag = new offset(); // holds offset from mouse click to ship's origin
-		final int cellSize = 30; // size of each cell in grid
-		final int gridSize = 10; // 10x10 grid
-
-		// event handler for mouse press actions on ship
-		ship.setOnMousePressed(e -> {
-
-			// calculates and stores the offset from where ship is clicked.
-			drag.x = e.getSceneX() - (ship.getX() + ship.getTranslateX());
-			drag.y = e.getSceneY() - (ship.getY() + ship.getTranslateY());
-			ship.setCursor(Cursor.MOVE); // changes cursor to drag
-		});
-
-		// event handler for mouse drag
-		ship.setOnMouseDragged(e -> {
-			// updates ship's position based on cursor's current position minus offset
-			ship.setTranslateX(e.getSceneX() - drag.x - ship.getX());
-			ship.setTranslateY(e.getSceneY() - drag.y - ship.getY());
-		});
-
-		// event handler for mouse release
-		ship.setOnMouseReleased(e -> {
-			ship.setCursor(Cursor.HAND); // change cursor back to default
-
-			// calculates the nearest grid position to place ship
-			double potentialNewX = Math.round((ship.getTranslateX() + ship.getX()) / cellSize) * cellSize;
-			double potentialNewY = Math.round((ship.getTranslateY() + ship.getY()) / cellSize) * cellSize;
-
-			// set ship's position to the nearest grid point if over the grid
-			if (potentialNewX >= 0 && potentialNewX + ship.getWidth() <= cellSize * gridSize &&
-				potentialNewY >= 0 && potentialNewY + ship.getHeight() <= cellSize * gridSize) {
-				ship.setTranslateX(potentialNewX - ship.getX());
-				ship.setTranslateY(potentialNewY - ship.getY());
-			}
-			// reset position if not a valid drop
-			else {
-				ship.setTranslateX(0);
-				ship.setTranslateY(0);
-			}
-		});
-	}
-
-	class offset { double x, y; } // helper class to store x and y offsets for dragging
-
-//	public Scene createSetUpShipScene(Stage primaryStage) {
-//		BorderPane pane =  new BorderPane();
-//		Button backBtn = getBackBtn("options", primaryStage);
-//		VBox root = new VBox(10);
-//		Pane shipContainer = new Pane(); // container to hold all ships
-//		shipContainer.setPrefSize(300, 150);
-//
-//		setupGrid(shipContainer); // grid setup in ship container
-//
-//		int xOffset = 10; // initial horizontal offset for first ship
-//		int[] shipLengths = {5, 4, 3, 3, 2}; // all ship lengths
-//		for (int length : shipLengths) {
-//			Rectangle ship = new Rectangle(length * 30, 30); // creates ship with specific size
-//			ship.setFill(Color.GRAY);
-//			enableDrag(ship); // enables dragging functionality
-//			ship.setX(xOffset); // sets initial x position of ship
-//			ship.setY(525); // sets initial y position of ship
-//			xOffset += (length * 30) + 10; // increments x offset for next ship
-//			shipContainer.getChildren().add(ship); // adds ship to the container
-//			ship.setViewOrder(-100.0); // ensures the ship is rendered on top
-//		}
-//
-//		root.getChildren().addAll(new Label("Place your ships:"), shipContainer);
-//		BorderPane.setAlignment(backBtn, Pos.TOP_LEFT);
-//		pane.setTop(backBtn);
-//
-//		Color backgroundColor = Color.web("#C7FBFF");
-//		pane.setBackground(new Background(new BackgroundFill(backgroundColor, CornerRadii.EMPTY, Insets.EMPTY)));
-//		pane.setCenter(root);
-
-//		return new Scene(pane, 800, 600);
-//	}
-//
-//	private void setupGrid(Pane boardPane) {
-//		for (int i = 0; i < 10; i++) {
-//			for (int j = 0; j < 10; j++) {
-//				Rectangle cell = new Rectangle(30, 30); // create each cell in the grid
-//				cell.setFill(Color.LIGHTBLUE);
-//				cell.setStroke(Color.BLACK);
-//				cell.setX(j * 30); // position cells horizontally
-//				cell.setY(i * 30); // position cells vertically
-//				boardPane.getChildren().add(cell); // adds cell to the pane
-//			}
-//		}
-//	}
-
 	public Scene createSetUpShipScene(Stage primaryStage) {
-//		List<Rectangle> ships = new ArrayList<>();
-//		List<Boolean> isHorizontal = new ArrayList<>();
-
 		
 		GridPane gridPane = new GridPane();
 		gridPane.setAlignment(Pos.TOP_CENTER);
@@ -562,16 +354,7 @@ public class GuiClient extends Application{
 
 		int xOffset = 10; // initial horizontal offset for first ship
 		int[] shipLengths = {5, 4, 3, 3, 2}; // all ship lengths
-//		String[] theNames = {""};
-//		String[] shipLengths = {"5", "4", "3", "3", "2"};
 		for (int i = 0; i < shipLengths.length; i++) {
-//			Rectangle ship = new Rectangle(length * 30, 30); // creates ship with specific size
-//			ship.setFill(Color.GRAY);
-//			enableDrag(ship); // enables dragging functionality
-//			ship.setY(100); // sets initial y position of ship
-//			ships.add(ship);
-//			isHorizontal.add(true);
-//			ship.setViewOrder(-100.0); // ensures the ship is rendered on top
 			int length = shipLengths[i];
 			Button shipButton = new Button(String.valueOf(length));
 			shipButton.setPrefSize(length * 30, 20);
@@ -768,7 +551,7 @@ public class GuiClient extends Application{
 				int finalJ = y;
 				button.setOnAction(e -> {
 					handleGridClick(finalI, finalJ);
-					clientConnection.send(new Message("Move", currUsername, enemy, finalI, finalJ, true));
+//					clientConnection.send(new Message("Move", currUsername, enemy, finalI, finalJ, true));
 				});
 				buttons2Enemy[x][y] = button;
 				gridPaneEnemy.add(button, y,  x);
@@ -778,16 +561,17 @@ public class GuiClient extends Application{
 		// TODO: This is the hit button. When the user presses it we send messageContent "PlayTurn"
 		// This message will also contain the x and y coord for the server to check if the user hit another ship or not
 		// IE the clientThread.grid's ship.
-		hit = new Button("Hit");
 		if(myTurn){
 			hit.setDisable(false);
+		} else {
+			hit.setDisable(true);
 		}
 		//TODO: make sure that the user cannot send empty hit
 		hit.setStyle(btnStyle);
 		hit.setOnAction( e -> {
 			hit.setDisable(true);
 //			clientConnection.send(new Message("PlayTurn", enemy));
-			clientConnection.send(new Message("Move", currUsername, enemy, xMove, yMove, true));
+			clientConnection.send(new Message("Move", currUsername, enemy, xMove, yMove, false));
 		});
 
 		BorderPane pane = new BorderPane();
@@ -956,109 +740,6 @@ public class GuiClient extends Application{
 		return new Scene(root, 800, 600);
 	}
 
-	public Scene createSelectUserScene(Stage primaryStage){
-		BorderPane pane = new BorderPane();
-
-		// Create back button
-		Image home = new Image("back_arrow.png");
-		ImageView homeView = new ImageView(home);
-		homeView.setFitHeight(15);
-		homeView.setFitWidth(15);
-		Button backBtn = new Button();
-
-		// brings you back to the clientGUI screen when you click the back button
-		backBtn.setOnAction( e -> {
-			primaryStage.setScene(sceneMap.get("client"));
-		});
-		backBtn.setGraphic(homeView);
-		backBtn.setStyle(btnStyle.concat("-fx-font-size: 14; -fx-padding: 10; -fx-background-radius: 25px; -fx-cursor: hand"));
-
-		BorderPane.setAlignment(backBtn, Pos.TOP_LEFT);
-		pane.setTop(backBtn);
-
-		Color backgroundColor = Color.web("#C7FBFF");
-		pane.setBackground(new Background(new BackgroundFill(backgroundColor, CornerRadii.EMPTY, Insets.EMPTY)));
-
-		Label title = new Label("Select the user you want to send to:");
-		title.setStyle(titleStyle);
-
-		Button send = new Button("Send");
-
-		// event handler for selecting a user from the list
-		displayListItems.setOnMouseClicked(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				selectedUser = displayListItems.getSelectionModel().getSelectedItem();
-				send.setDisable(false); // enable send button after a user is selected
-			}
-		});
-		
-		// disables the button to send if no user is selected
-		if(selectedUser == ""){
-			send.setDisable(true);
-		}
-		send.setStyle(btnStyle);
-
-		// event handles for the send button
-//		send.setOnAction(e -> {
-//			String currMsgContent = messageTextField.getText();
-//			String usernameCurrent = clientConnection.getUsername();
-////			Message msg = new Message(usernameCurrent, currMsgContent, selectedUser);
-//			clientConnection.send(msg);
-//			listItems2.getItems().add("Sent to " + selectedUser + ": " + currMsgContent);
-//			messageTextField.clear();
-//			primaryStage.setScene(sceneMap.get("client"));
-//		});
-
-		// layout for user selection
-		VBox users = new VBox(20, title, displayListItems, send);
-		users.setStyle("-fx-background-color: #F4DAB3; -fx-font-family: 'serif'");
-		VBox.setMargin(users, new Insets(30));
-		users.setAlignment(Pos.CENTER);
-		displayListItems.setMaxWidth(400);
-		displayListItems.setMaxHeight(200);
-		pane.setCenter(users);
-		return new Scene(pane,800, 600);
-	}
-
-	public Scene createViewMessages(Stage primaryStage) {
-		BorderPane pane = new BorderPane();
-//
-		// Create back button
-		Image home = new Image("back_arrow.png");
-		ImageView homeView = new ImageView(home);
-		homeView.setFitHeight(15);
-		homeView.setFitWidth(15);
-		Button backBtn = new Button();
-
-		// brings you back to options scene when you click back button
-		backBtn.setOnAction( e -> {
-			primaryStage.setScene(sceneMap.get("options"));
-		});
-		backBtn.setGraphic(homeView);
-		backBtn.setStyle(btnStyle.concat("-fx-font-size: 14; -fx-padding: 10; -fx-background-radius: 25px; -fx-cursor: hand"));
-
-		BorderPane.setAlignment(backBtn, Pos.TOP_LEFT);
-		pane.setTop(backBtn);
-
-		Color backgroundColor = Color.web("#C7FBFF");
-		pane.setBackground(new Background(new BackgroundFill(backgroundColor, CornerRadii.EMPTY, Insets.EMPTY)));
-
-		Label title = new Label("Messages");
-		title.setStyle(titleStyle);
-
-		VBox vbox = new VBox(10, title, listItems2); // adds message chat to vbox
-
-		VBox.setMargin(vbox, new Insets(70));
-		vbox.setAlignment(Pos.CENTER);
-		BorderPane.setMargin(pane, new Insets(70));
-		listItems2.setMaxWidth(400);
-		listItems2.setMaxHeight(250);
-		pane.setCenter(vbox);
-
-		return new Scene(pane, 800, 600);
-	}
-
 	private Scene createWaitingScene(Stage primaryStage){
 		BorderPane pane = new BorderPane();
 
@@ -1071,82 +752,5 @@ public class GuiClient extends Application{
 		return new Scene(pane, 800, 600);
 	}
 
-	// helper function to update the user list
-//	private void updateUserList(Message msg) {
-//		storeUsersInListView.clear(); // clears current list of users in order to update
-//		storeUsersInListView.addAll(msg.getListOfUsers()); // adds all users received from server message
-//		displayListUsers.setItems(storeUsersInListView); // sets updated lists
-//		displayListItems.getItems().clear(); // clears items in display list that is used for selecting user to send private messages
-//		for(String user: msg.getListOfUsers()) { // goes through each user received in message's user list and adds user to list if allowed
-//			if(!user.equals(currUsername))
-//				displayListItems.getItems().add(user);
-//		}
-//	}
 
-
-
-
-	//		flipButton.setOnAction(e -> {
-//
-//			// for each ship, toggles it horizontally/vertically
-//			for (int i = 0; i < ships.size(); i++) {
-//
-//				Rectangle ship = ships.get(i);
-//				boolean horizontal = isHorizontal.get(i);
-//
-//				if (horizontal) {
-//					ship.setWidth(shipLengths[i] * 30);
-//					ship.setHeight(30);
-//				} else {
-//					ship.setWidth(30);
-//					ship.setHeight(shipLengths[i] * 30);
-//				}
-//				isHorizontal.set(i, !horizontal);
-//
-//			}
-//		});
-
-	class ShipInfo {
-		Button shipButton;
-		int length;
-		boolean isPlaced = false;
-
-		public ShipInfo(Button shipButton, int length) {
-			this.shipButton = shipButton;
-			this.length = length;
-		}
-	}
-
-//	public class BattleshipAI {
-//		private int gridSize = 10; // assuming a 10x10 grid
-//		private boolean[][] grid = new boolean[gridSize][gridSize]; // track placed ships
-//		public GuiClient theGui = new GuiClient();
-//
-//		// Randomly place ships on the grid
-//		public void placeShips() {
-//			int[] shipSizes = {5, 4, 3, 3, 2}; // sizes of the ships
-//			Random random = new Random();
-//
-//			for (int size : shipSizes) {
-//				boolean placed = false;
-//				while (!placed) {
-//					int x = random.nextInt(gridSize);
-//					int y = random.nextInt(gridSize);
-//					boolean horizontal = random.nextBoolean();
-//					//int startX, int startY, ShipInfo ship
-//					if (canPlaceShip(x, y, ShipInfo ship)) {
-//						for (int i = 0; i < size; i++) {
-//							if (horizontal) {
-//								grid[x][y + i] = true; // Place horizontally
-//							} else {
-//								grid[x + i][y] = true; // Place vertically
-//							}
-//						}
-//						placed = true;
-//					}
-//				}
-//			}
-//
-//		}
-//	}
 }
