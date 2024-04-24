@@ -75,10 +75,6 @@ public class GuiClient extends Application{
 	Button flipButton = new Button("Flip");
 	Button hit;
 
-	private Button lastSelectedButton = null;
-	private int lastSelectedX = -1;
-	private int lastSelectedY = -1;
-
 
 
 	// styling strings for different UI
@@ -108,67 +104,45 @@ public class GuiClient extends Application{
 					showAlert("Be original, Professor McCarty dislikes copycats!", primaryStage);
 				}
 				else {
-//					// if the user leaves, shows the leave message in the chat log and updates the active users list
-//					if (msg.getMessageContent().endsWith("has left the chat.")) {
-//						//pop up an alert and end game (go back to home page)
-//						listItems2.getItems().add(msg.getMessageContent());
-////						updateUserList(msg);
-//					}
-//					else {
-						if("Paired".equals(msg.getMessageContent())){
-							enemy = msg.getPlayer2();
-							myTurn = msg.getMyTurn();
-							if(myTurn){
-								hit.setDisable(false);
-							} else {
-								hit.setDisable(true);
-							}
-							ArrayList<ArrayList<Character>> newGrid = new ArrayList<>();
-							for (int i = 0; i < size; i++) {
-								ArrayList<Character> row = new ArrayList<>();
-								for (int j = 0; j < size; j++) {
-									row.add(msg.getPlayer1grid().get(i).get(j)); // Replace defaultValue with the default value you want to initialize the grid with
-								}
-								newGrid.add(row);
-							}
-							grid.addAll(newGrid);
-							// go to next scene
-							System.out.println(grid);
-							createUserVSUserScene(primaryStage, grid);
-						}
-						if ("Waiting".equals(msg.getMessageContent()) && msg.getPlayer1().equals(currUsername)){
-//							System.out.println(grid);
-							primaryStage.setScene(sceneMap.get("waitingScene"));
+					if("Paired".equals(msg.getMessageContent())){
+						enemy = msg.getPlayer2();
+						myTurn = msg.getMyTurn();
+						if(myTurn){
+							hit.setDisable(false);
 						} else {
-							boolean isForCurrentUser = msg.getPlayer2().equals(clientConnection.getUsername());
-							if (isForCurrentUser || msg.getPlayer1().equals(clientConnection.getUsername())) {
-								String privateMsg = "Whisper from " + msg.getPlayer1() + ": " + msg.getMessageContent();
-								listItems2.getItems().add(privateMsg);
-							}
+							hit.setDisable(true);
 						}
 
-						if("Hit".equals(msg.getMessageContent())){
-							//update enemy's grid
-							enemyGrid.get(msg.getX()).set(msg.getY(), 'H');
-							myTurn = msg.getMyTurn();
-							if(myTurn){
-								hit.setDisable(false);
-							} else {
-								hit.setDisable(true);
-							}
-//							primaryStage.setScene("")
+						createUserVSUserScene(primaryStage, grid);
+					}
+					if ("Waiting".equals(msg.getMessageContent()) && msg.getPlayer1().equals(currUsername)){
+//							System.out.println(grid);
+						primaryStage.setScene(sceneMap.get("waitingScene"));
+					}
 
-						} else if("Miss".equals(msg.getMessageContent())){
-							//update enemy's grid
-							enemyGrid.get(msg.getX()).set(msg.getY(), 'M');
-							myTurn = msg.getMyTurn();
-							if(myTurn){
-								hit.setDisable(false);
-							} else {
-								hit.setDisable(true);
-							}
+					if("Hit".equals(msg.getMessageContent())){
+						//update enemy's grid
+						enemyGrid.get(msg.getX()).set(msg.getY(), 'H');
+						myTurn = msg.getMyTurn();
+						if(myTurn){
+							hit.setDisable(false);
+						} else {
+							hit.setDisable(true);
 						}
+						updateGridCell(msg.getX(), msg.getY(), msg.getMessageContent());
 
+
+					} else if("Miss".equals(msg.getMessageContent())){
+						//update enemy's grid
+						enemyGrid.get(msg.getX()).set(msg.getY(), 'M');
+						myTurn = msg.getMyTurn();
+						if(myTurn){
+							hit.setDisable(false);
+						} else {
+							hit.setDisable(true);
+						}
+						updateGridCell(msg.getX(), msg.getY(), msg.getMessageContent());
+					}
 				}
 			});
 		});
@@ -198,7 +172,6 @@ public class GuiClient extends Application{
 			buttonsClickedCount = 0;
 			hit.setDisable(true);
 			clientConnection.send(new Message("Move", currUsername, enemy, xMove, yMove, false));
-//			clientConnection.send(new Message("PlayTurn", enemy));
 
 		});
 
@@ -226,6 +199,32 @@ public class GuiClient extends Application{
 		primaryStage.setTitle("Client");
 		primaryStage.show();
 	}
+
+	private void updateGridCell(int x, int y, String result) {
+		Platform.runLater(() -> {
+			// Determine if the update is for the user's grid or enemy's grid
+			if (result.equals("Hit") || result.equals("Miss")) {
+				char status = result.equals("Hit") ? 'H' : 'M';
+				// Update the user's grid if the opponent hits
+				if (myTurn) {
+					grid.get(x).set(y, status);
+					Button btn = buttons2[x][y];
+					btn.setText(result.equals("Hit") ? "H" : "M");
+					btn.setStyle(result.equals("Hit") ? "-fx-background-color: red;" : "-fx-background-color: grey;");
+				}
+				else {
+					enemyGrid.get(x).set(y, status);
+					Button btn = buttons2Enemy[x][y];
+					btn.setText(result.equals("Hit") ? "H" : "M");
+					btn.setStyle(result.equals("Hit") ? "-fx-background-color: red;" : "-fx-background-color: grey;");
+				}
+				// Update the button on the user's grid UI to reflect the hit or miss
+
+			}
+		});
+	}
+
+
 
 	public Button getBackBtn(String scene, Stage primaryStage){
 		// Create back button
@@ -579,18 +578,6 @@ public class GuiClient extends Application{
 			}
 		}
 
-		// TODO: This is the hit button. When the user presses it we send messageContent "PlayTurn"
-		// This message will also contain the x and y coord for the server to check if the user hit another ship or not
-		// IE the clientThread.grid's ship.
-		//TODO: make sure that the user cannot send empty hit
-//		hit.setStyle(btnStyle);
-//		hit.setOnAction( e -> {
-//			buttonsClickedCount = 0;
-//			hit.setDisable(true);
-//			clientConnection.send(new Message("Move", currUsername, enemy, xMove, yMove, false));
-////			clientConnection.send(new Message("PlayTurn", enemy));
-//
-//		});
 
 		BorderPane pane = new BorderPane();
 		Color backgroundColor = Color.web("#C7FBFF");
@@ -770,5 +757,28 @@ public class GuiClient extends Application{
 		return new Scene(pane, 800, 600);
 	}
 
+	private void enableButtons() {
+		Platform.runLater(() -> {
+			// Enable buttons based on the enemy grid state
+			for (int x = 0; x < size; x++) {
+				for (int y = 0; y < size; y++) {
+					Button button = buttons2Enemy[x][y];
+					// Only enable the button if it corresponds to a 'W' cell, indicating untargeted water
+					button.setDisable(!(enemyGrid.get(x).get(y) == 'W'));
+				}
+			}
+		});
+	}
+
+	private void disableButtons() {
+		Platform.runLater(() -> {
+			// Disable all buttons in the enemy grid
+			for (int x = 0; x < size; x++) {
+				for (int y = 0; y < size; y++) {
+					buttons2Enemy[x][y].setDisable(true);
+				}
+			}
+		});
+	}
 
 }
