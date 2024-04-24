@@ -193,7 +193,14 @@ public class GuiClient extends Application{
 		}
 
 		hit = new Button("Hit");
+		hit.setStyle(btnStyle);
+		hit.setOnAction( e -> {
+			buttonsClickedCount = 0;
+			hit.setDisable(true);
+			clientConnection.send(new Message("Move", currUsername, enemy, xMove, yMove, false));
+//			clientConnection.send(new Message("PlayTurn", enemy));
 
+		});
 
 		// scene map for different scenes
 		sceneMap = new HashMap<String, Scene>();
@@ -576,19 +583,14 @@ public class GuiClient extends Application{
 		// This message will also contain the x and y coord for the server to check if the user hit another ship or not
 		// IE the clientThread.grid's ship.
 		//TODO: make sure that the user cannot send empty hit
-		hit.setStyle(btnStyle);
-		hit.setOnAction( e -> {
-			// HRISTIAN CHANGE.
-			Platform.runLater(() -> {
-				buttonsClickedCount = 0;
-						hit.setDisable(true);
-						clientConnection.send(new Message("Move", currUsername, enemy, xMove, yMove, false));
-			//			clientConnection.send(new Message("PlayTurn", enemy));
-				}
-
-				);
-
-		});
+//		hit.setStyle(btnStyle);
+//		hit.setOnAction( e -> {
+//			buttonsClickedCount = 0;
+//			hit.setDisable(true);
+//			clientConnection.send(new Message("Move", currUsername, enemy, xMove, yMove, false));
+////			clientConnection.send(new Message("PlayTurn", enemy));
+//
+//		});
 
 		BorderPane pane = new BorderPane();
 		Color backgroundColor = Color.web("#C7FBFF");

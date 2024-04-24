@@ -128,29 +128,38 @@ public class Server{
 			// method to send a message to all clients or specific client
 			public void updateClients(Message message) {
 
-				    // sends a private message to a specific user
-					String user = message.getPlayer1();
-					String enemy = message.getPlayer2();
-					System.out.println(message.getMessageContent() + " to " + user + " and " + enemy);
-					for(ClientThread t : clients) {
-						try {
-							if(t.clientName.equals(user)) {
-//								message.setMyTurn(true);
-								System.out.println("Sending: " + message.getMessageContent() + " to " + user);
-								System.out.println(message.getPlayer1() + "'s turn: " + message.getMyTurn());
-								t.grid = message.getPlayer1grid();
-								t.out.writeObject(message);
-							} else if (enemy != null && t.clientName.equals(enemy)) {
-								System.out.println("Sending: " + message.getMessageContent() + " to " + enemy);
-								System.out.println(message.getPlayer1() + "'s turn: " + message.getMyTurn());
-//								Message msg = new Message(enemy, message.getMessageContent(), user, message.getPlayer1grid(), false);
-//								msg.setMyTurn(false);
-								t.out.writeObject(message);
-							}
-						} catch (Exception e) {
-							e.printStackTrace();
+				// sends a private message to a specific user
+//				String user = message.getPlayer1();
+//				String enemy = message.getPlayer2();
+//				System.out.println(message.getMessageContent() + " to " + user + " and " + enemy);
+//				for (ClientThread t : clients) {
+//					try {
+//						if (t.clientName.equals(user)) {
+////								message.setMyTurn(true);
+//							System.out.println("Sending: " + message.getMessageContent() + " to " + user);
+//							System.out.println(message.getPlayer1() + "'s turn: " + message.getMyTurn());
+//							t.grid = message.getPlayer1grid();
+//							t.out.writeObject(message);
+//						} else if (enemy != null && t.clientName.equals(enemy)) {
+//							System.out.println("Sending: " + message.getMessageContent() + " to " + enemy);
+//							System.out.println(message.getPlayer1() + "'s turn: " + message.getMyTurn());
+////								Message msg = new Message(enemy, message.getMessageContent(), user, message.getPlayer1grid(), false);
+////								msg.setMyTurn(false);
+//							t.out.writeObject(message);
+//						}
+//					} catch (Exception e) {
+//						e.printStackTrace();
+//					}
+//				}
+				for(ClientThread t : clients) {
+					try {
+						if(t.clientName.equals(message.getPlayer1())) {
+							t.out.writeObject(message);
 						}
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
+				}
 			}
 
 			public void pairPlayers(Message message){
@@ -209,8 +218,6 @@ public class Server{
 							}
 						}
 						System.out.println("Updating enemy's grid: " + grid);
-						// TODO: send whether it was a hit or a miss back to the **user** and set myTurn as false (two different messages depending on who is playing the move)
-						// TODO: send whether it was a hit or a miss back to the **enemy** and set myTurn as false (two different messages depending on who is playing the move)
 						if(grid.get(message.getX()).get(message.getY()) == 'B'){
 							grid.get(message.getX()).set(message.getY(), 'H');
 							updateClients(new Message("Hit", message.getPlayer1(),message.getPlayer2(), message.getX(), message.getY(), false));

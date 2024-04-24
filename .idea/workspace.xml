@@ -4,14 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project3Client/src/main/java/GuiClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project3Client/src/main/java/GuiClient.java" afterDir="false" />
-    </list>
-    <list id="e0d7bac4-21a1-496c-8df6-91c88625f3a2" name="Changes by victoriarossi" comment="">
-      <change beforePath="$PROJECT_DIR$/Project3Client/src/main/java/GuiClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project3Client/src/main/java/GuiClient.java" afterDir="false" />
-    </list>
+    <list default="true" id="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" name="Changes" comment="" />
+    <list id="e0d7bac4-21a1-496c-8df6-91c88625f3a2" name="Changes by victoriarossi" comment="" />
     <list id="db7ca0c4-a3d0-4ec7-a776-f808cde17f6b" name="Changes by xristianbg" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,41 +37,8 @@
     &quot;accountId&quot;: &quot;3237aa44-2960-498c-89fa-5b63ccfdf2b5&quot;
   }
 }</component>
-  <component name="LineStatusTrackerManager">
-    <file path="$PROJECT_DIR$/Project3Client/src/main/java/GuiClient.java">
-      <ranges>
-        <range start1="0" end1="1" start2="0" end2="0" changelist="e0d7bac4-21a1-496c-8df6-91c88625f3a2" />
-        <range start1="4" end1="5" start2="3" end2="3" changelist="e0d7bac4-21a1-496c-8df6-91c88625f3a2" />
-        <range start1="9" end1="10" start2="7" end2="7" changelist="e0d7bac4-21a1-496c-8df6-91c88625f3a2" />
-        <range start1="14" end1="15" start2="11" end2="12" changelist="e0d7bac4-21a1-496c-8df6-91c88625f3a2" />
-        <range start1="20" end1="21" start2="17" end2="17" changelist="e0d7bac4-21a1-496c-8df6-91c88625f3a2" />
-        <range start1="23" end1="24" start2="19" end2="19" changelist="e0d7bac4-21a1-496c-8df6-91c88625f3a2" />
-        <range start1="69" end1="69" start2="64" end2="66" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
-        <range start1="72" end1="72" start2="69" end2="71" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
-        <range start1="77" end1="77" start2="76" end2="81" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
-        <range start1="132" end1="133" start2="136" end2="137" changelist="e0d7bac4-21a1-496c-8df6-91c88625f3a2" />
-        <range start1="500" end1="501" start2="504" end2="505" changelist="e0d7bac4-21a1-496c-8df6-91c88625f3a2" />
-        <range start1="514" end1="514" start2="518" end2="519" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
-        <range start1="521" end1="521" start2="526" end2="527" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
-        <range start1="524" end1="525" start2="530" end2="536" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
-        <range start1="526" end1="527" start2="537" end2="537" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
-        <range start1="532" end1="533" start2="542" end2="542" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
-        <range start1="551" end1="551" start2="560" end2="561" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
-        <range start1="552" end1="554" start2="562" end2="568" changelist="e0d7bac4-21a1-496c-8df6-91c88625f3a2" />
-        <range start1="563" end1="568" start2="577" end2="577" changelist="e0d7bac4-21a1-496c-8df6-91c88625f3a2" />
-        <range start1="571" end1="574" start2="580" end2="590" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
-      </ranges>
-    </file>
-  </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
-  </component>
-  <component name="MavenImportPreferences">
-    <option name="generalSettings">
-      <MavenGeneralSettings>
-        <option name="useMavenConfig" value="true" />
-      </MavenGeneralSettings>
-    </option>
   </component>
   <component name="ProjectCodeStyleSettingsMigration">
     <option name="version" value="2" />
@@ -126,6 +87,7 @@
         <option name="myRunnerSettings" />
         <option name="myRunnerParameters">
           <MavenRunnerParameters>
+            <option name="cmdOptions" />
             <option name="profiles">
               <set />
             </option>
@@ -136,9 +98,13 @@
                 <option value="exec:java" />
               </list>
             </option>
+            <option name="multimoduleDir" />
             <option name="pomFileName" />
             <option name="profilesMap">
               <map />
+            </option>
+            <option name="projectsCmdOptionValues">
+              <list />
             </option>
             <option name="resolveToWorkspace" value="false" />
             <option name="workingDirPath" value="$PROJECT_DIR$/Project3Client" />
@@ -153,6 +119,7 @@
         <option name="myRunnerSettings" />
         <option name="myRunnerParameters">
           <MavenRunnerParameters>
+            <option name="cmdOptions" />
             <option name="profiles">
               <set />
             </option>
@@ -163,9 +130,13 @@
                 <option value="exec:java" />
               </list>
             </option>
+            <option name="multimoduleDir" />
             <option name="pomFileName" />
             <option name="profilesMap">
               <map />
+            </option>
+            <option name="projectsCmdOptionValues">
+              <list />
             </option>
             <option name="resolveToWorkspace" value="false" />
             <option name="workingDirPath" value="$PROJECT_DIR$/Project3Server" />
