@@ -54,7 +54,7 @@ public class Server{
 
 			String clientName = "";
 			boolean paired = false;
-			boolean firstTurn = false;
+			boolean myTurn = false;
 			ArrayList<ArrayList<Character>> grid = new ArrayList<>();
 
 
@@ -135,14 +135,14 @@ public class Server{
 					for(ClientThread t : clients) {
 						try {
 							if(t.clientName.equals(user)) {
-								message.setFirstTurn(true);
+								message.setMyTurn(true);
 								System.out.println("Sending: " + message.getMessageContent() + " to " + user);
 								t.grid = message.getPlayer1grid();
 								t.out.writeObject(new Message(message, message.getPlayer1grid()));
 							} else if (t.clientName.equals(enemy)) {
 								System.out.println("Sending: " + message.getMessageContent() + " to " + enemy);
-								Message msg = new Message(enemy, message.getMessageContent(), user, message.getPlayer1grid());
-								msg.setFirstTurn(false);
+								Message msg = new Message(enemy, message.getMessageContent(), user, message.getPlayer1grid(), false);
+								msg.setMyTurn(false);
 								t.out.writeObject(msg);
 							}
 						} catch (Exception e) {
@@ -162,10 +162,10 @@ public class Server{
 						for (ClientThread t : clients) {
 							if (enemy.getUsername().equals(t.clientName)) {
 								t.paired = true;
-								t.firstTurn = true;
+								t.myTurn = true;
 //								System.out.println(t.clientName + "'s Grid on thread " +  enemy.getGrid());
 								System.out.println("Sending " + enemy.getUsername() + " with " + message.getPlayer1() + " as enemy");
-								Message msg = new Message(enemy.getUsername(), "Paired", message.getPlayer1(), enemy.getGrid());
+								Message msg = new Message(enemy.getUsername(), "Paired", message.getPlayer1(), enemy.getGrid(), true);
 								try {
 									t.out.writeObject(msg);
 								} catch (Exception e) {
@@ -174,7 +174,7 @@ public class Server{
 							} else if (message.getPlayer1().equals(t.clientName)) { // look for my thread
 								try {
 									System.out.println("S ending " + message.getPlayer1() + " (should be bob) with " + enemy.getUsername() + " as enemy");
-									t.out.writeObject(new Message(message.getPlayer1(), "Paired", enemy.getUsername(), message.getPlayer1grid()));
+									t.out.writeObject(new Message(message.getPlayer1(), "Paired", enemy.getUsername(), message.getPlayer1grid(), false));
 								} catch (Exception e) {
 									e.printStackTrace();
 								}
@@ -207,12 +207,14 @@ public class Server{
 							}
 						}
 						System.out.println("Updating enemy's grid: " + grid);
+						// TODO: send whether it was a hit or a miss back to the **user** and set myTurn as false (two different messages depending on who is playing the move)
+						// TODO: send whether it was a hit or a miss back to the **enemy** and set myTurn as false (two different messages depending on who is playing the move)
 						if(grid.get(message.getX()).get(message.getY()) == 'B'){
 							grid.get(message.getX()).set(message.getY(), 'H');
-							updateClients(new Message(message.getPlayer1(), "Hit",message.getPlayer2()));
+							updateClients(new Message("Hit", message.getPlayer1(),message.getPlayer2(), message.getX(), message.getY(), false));
 						} else if(grid.get(message.getX()).get(message.getY()) == 'W'){
 							grid.get(message.getX()).set(message.getY(), 'M');
-							updateClients(new Message(message.getPlayer1(), "Miss",message.getPlayer2()));
+							updateClients(new Message("Miss", message.getPlayer1(),message.getPlayer2(), message.getX(), message.getY(), false));
 						}
 					}
 				}

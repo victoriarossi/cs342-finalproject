@@ -1,6 +1,5 @@
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 
 public class Message implements Serializable {
     static final long serialVersionUID = 42L;
@@ -16,7 +15,7 @@ public class Message implements Serializable {
     private int x; // row
     private int y; // column
     private String userIDReceiver; // ID of user receiving a private message
-    private boolean firstTurn;
+    private boolean myTurn;
 
     // Constructor to initialize message object with userID, message content, and type of message
 //    public Message(String player1, String player2) {
@@ -39,12 +38,13 @@ public class Message implements Serializable {
         this.player1grid = grid;
     }
 
-    public Message(String player1, String messageContent, String player2, ArrayList<ArrayList<Character>> grid){
+    public Message(String player1, String messageContent, String player2, ArrayList<ArrayList<Character>> grid, Boolean myTurn){
         this.player1 = player1;
         this.messageContent = messageContent;
         this.playingAI = false;
         this.player2 = player2;
         this.player1grid = grid;
+        this.myTurn = myTurn;
     }
 
     public Message(Message message, ArrayList<ArrayList<Character>> grid){
@@ -60,13 +60,14 @@ public class Message implements Serializable {
         this.y = y;
     }
 
-    public Message(String messageContent, String player1, String player2, int x, int y){
+    public Message(String messageContent, String player1, String player2, int x, int y, Boolean myTurn){
         this.player1 = player1;
         this.messageContent = messageContent;
         this.playingAI = false;
         this.player2 = player2;
         this.x = x;
         this.y = y;
+        this.myTurn = myTurn;
     }
 
     // getter to retrieve userID of the message
@@ -96,13 +97,13 @@ public class Message implements Serializable {
     }
 
     // setter to set the first turn
-    public void setFirstTurn(boolean firstTurn){
-        this.firstTurn = firstTurn;
+    public void setMyTurn(boolean myTurn){
+        this.myTurn = myTurn;
     }
 
     // getter to set the first turn
-    public boolean getFirstTurn(){
-        return firstTurn;
+    public boolean getMyTurn(){
+        return myTurn;
     }
 
     // getter to get player 1's grid

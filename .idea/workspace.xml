@@ -37,6 +37,27 @@
     &quot;accountId&quot;: &quot;3237aa44-2960-498c-89fa-5b63ccfdf2b5&quot;
   }
 }</component>
+  <component name="LineStatusTrackerManager">
+    <file path="$PROJECT_DIR$/Project3Client/src/main/java/GuiClient.java">
+      <ranges>
+        <range start1="1" end1="2" start2="1" end2="1" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
+        <range start1="5" end1="6" start2="4" end2="6" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
+        <range start1="74" end1="74" start2="74" end2="75" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
+        <range start1="75" end1="75" start2="76" end2="77" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
+        <range start1="113" end1="115" start2="115" end2="116" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
+        <range start1="141" end1="142" start2="142" end2="145" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
+        <range start1="144" end1="145" start2="147" end2="149" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
+        <range start1="146" end1="147" start2="150" end2="160" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
+        <range start1="697" end1="697" start2="710" end2="715" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
+        <range start1="715" end1="716" start2="733" end2="733" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
+        <range start1="752" end1="753" start2="769" end2="771" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
+        <range start1="758" end1="759" start2="776" end2="796" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
+        <range start1="761" end1="761" start2="798" end2="800" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
+        <range start1="762" end1="763" start2="801" end2="802" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
+        <range start1="1079" end1="1079" start2="1118" end2="1151" changelist="5d8f31a1-b8ef-4de0-bae9-4f3e318426e0" />
+      </ranges>
+    </file>
+  </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
@@ -174,7 +195,7 @@
       <workItem from="1713630246086" duration="1553000" />
       <workItem from="1713803548551" duration="12848000" />
       <workItem from="1713905677204" duration="7551000" />
-      <workItem from="1713919761683" duration="8293000" />
+      <workItem from="1713919761683" duration="13011000" />
     </task>
     <servers />
   </component>

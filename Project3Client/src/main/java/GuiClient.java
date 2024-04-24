@@ -1,9 +1,9 @@
 import java.awt.*;
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.function.Consumer;
+import java.util.Random;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -72,7 +72,9 @@ public class GuiClient extends Application{
 	Button start;
 	private int placedShipsCounter = 0;
 	String enemy;
+	Boolean myTurn = false;
 	Button flipButton = new Button("Flip");
+	Button hit;
 
 
 	// styling strings for different UI
@@ -111,8 +113,7 @@ public class GuiClient extends Application{
 //					else {
 						if("Paired".equals(msg.getMessageContent())){
 							enemy = msg.getPlayer2();
-							System.out.println(enemy);
-							System.out.println(currUsername);
+							myTurn = msg.getMyTurn();
 							ArrayList<ArrayList<Character>> newGrid = new ArrayList<>();
 							for (int i = 0; i < size; i++) {
 								ArrayList<Character> row = new ArrayList<>();
@@ -139,12 +140,24 @@ public class GuiClient extends Application{
 
 						if("Hit".equals(msg.getMessageContent())){
 							//update enemy's grid
-							enemyGrid.get(xMove).set(yMove, 'H');
+							enemyGrid.get(msg.getX()).set(msg.getY(), 'H');
+							myTurn = msg.getMyTurn();
+
 						} else if("Miss".equals(msg.getMessageContent())){
 							//update enemy's grid
-							enemyGrid.get(xMove).set(yMove, 'M');
+							enemyGrid.get(msg.getX()).set(msg.getY(), 'M');
+							myTurn = msg.getMyTurn();
 						}
-
+						// TODO: here we need to receive a message from the server and enable the button back.
+						// That is when an enemy presses the hit button we need to deal with what happens
+						// Tell the user if they were hit and re-enable the button.
+						else if("PlayTurn".equals(msg.getMessageContent())) {
+							if (myTurn) {
+								hit.setDisable(false);
+							} else {
+								hit.setDisable(true);
+							}
+						}
 
 						// updates the user list as long as it contains users
 //						if (msg.getListOfUsers() != null) {
@@ -696,6 +709,11 @@ public class GuiClient extends Application{
 		gameStarted = false;  // Reset game start flag
 	}
 
+	private void handleGridClick(int x, int y){
+		xMove = x;
+		yMove = y;
+	}
+
 
 	private void createuserVSUserScene(Stage primaryStage, ArrayList<ArrayList<Character>> grid) {
 
@@ -713,7 +731,6 @@ public class GuiClient extends Application{
 				Button button = new Button();
 //				System.out.println(grid.get(x).get(y));
 				if(grid.get(x).get(y).equals('B')) {
-
 					button.setStyle("-fx-background-color: #000000;");
 				} else {
 					button.setStyle("-fx-background-color: #77BAFC;");
@@ -750,17 +767,39 @@ public class GuiClient extends Application{
 				int finalI = x;
 				int finalJ = y;
 				button.setOnAction(e -> {
-					clientConnection.send(new Message("Move", currUsername, enemy, finalI, finalJ));
+					handleGridClick(finalI, finalJ);
+					clientConnection.send(new Message("Move", currUsername, enemy, finalI, finalJ, true));
 				});
 				buttons2Enemy[x][y] = button;
 				gridPaneEnemy.add(button, y,  x);
 			}
 		}
-//
+
+		// TODO: This is the hit button. When the user presses it we send messageContent "PlayTurn"
+		// This message will also contain the x and y coord for the server to check if the user hit another ship or not
+		// IE the clientThread.grid's ship.
+		hit = new Button("Hit");
+		if(myTurn){
+			hit.setDisable(false);
+		}
+		//TODO: make sure that the user cannot send empty hit
+		hit.setStyle(btnStyle);
+		hit.setOnAction( e -> {
+			hit.setDisable(true);
+//			clientConnection.send(new Message("PlayTurn", enemy));
+			clientConnection.send(new Message("Move", currUsername, enemy, xMove, yMove, true));
+		});
+
+		BorderPane pane = new BorderPane();
+		Color backgroundColor = Color.web("#C7FBFF");
+		pane.setBackground(new Background(new BackgroundFill(backgroundColor, CornerRadii.EMPTY, Insets.EMPTY)));
+
 		root.getChildren().addAll(gridPane, gridPaneEnemy);
 		root.setAlignment(Pos.CENTER);
+		pane.setCenter(root);
+		pane.setBottom(hit);
 //		return new Scene(root, 800, 600);
-		primaryStage.setScene(new Scene(root, 800, 600));
+		primaryStage.setScene(new Scene(pane, 800, 600));
 	}
 
 
@@ -1077,4 +1116,37 @@ public class GuiClient extends Application{
 			this.length = length;
 		}
 	}
+
+//	public class BattleshipAI {
+//		private int gridSize = 10; // assuming a 10x10 grid
+//		private boolean[][] grid = new boolean[gridSize][gridSize]; // track placed ships
+//		public GuiClient theGui = new GuiClient();
+//
+//		// Randomly place ships on the grid
+//		public void placeShips() {
+//			int[] shipSizes = {5, 4, 3, 3, 2}; // sizes of the ships
+//			Random random = new Random();
+//
+//			for (int size : shipSizes) {
+//				boolean placed = false;
+//				while (!placed) {
+//					int x = random.nextInt(gridSize);
+//					int y = random.nextInt(gridSize);
+//					boolean horizontal = random.nextBoolean();
+//					//int startX, int startY, ShipInfo ship
+//					if (canPlaceShip(x, y, ShipInfo ship)) {
+//						for (int i = 0; i < size; i++) {
+//							if (horizontal) {
+//								grid[x][y + i] = true; // Place horizontally
+//							} else {
+//								grid[x + i][y] = true; // Place vertically
+//							}
+//						}
+//						placed = true;
+//					}
+//				}
+//			}
+//
+//		}
+//	}
 }
