@@ -15,6 +15,7 @@ public class Server{
 //	ArrayList<ArrayList<>>
 	private Consumer<Serializable> callback;
 	private Stack<UserInfo> userStack = new Stack<>();
+	private ArrayList<UserInfo> userInfos = new ArrayList<>();
 
 	Server(Consumer<Serializable> call){
 	
@@ -97,7 +98,7 @@ public class Server{
 							if("Pair".equals(message.getMessageContent())){
 //								System.out.println(message.getPlayer1grid());
 								pairPlayers(message);
-							} else if("Grid".equals(message.getMessageContent())){
+							} else if("Move".equals(message.getMessageContent())){
 								// a player is playing a move
 								playMove(message);
 							}
@@ -153,6 +154,8 @@ public class Server{
 			public void pairPlayers(Message message){
 				if(!userStack.empty()) {
 					UserInfo enemy = userStack.pop();
+					userInfos.add(enemy);
+					userInfos.add(new UserInfo(message.getPlayer1(),message.getPlayer1grid()));
 //					System.out.println("user: " + message.getPlayer1() + " enemy: " + enemy.getUsername());
 					if (!enemy.getUsername().equals(message.getPlayer1())) {
 						// go over the threads and look for the enemy's thread
@@ -161,6 +164,7 @@ public class Server{
 								t.paired = true;
 								t.firstTurn = true;
 //								System.out.println(t.clientName + "'s Grid on thread " +  enemy.getGrid());
+								System.out.println("Sending " + enemy.getUsername() + " with " + message.getPlayer1() + " as enemy");
 								Message msg = new Message(enemy.getUsername(), "Paired", message.getPlayer1(), enemy.getGrid());
 								try {
 									t.out.writeObject(msg);
@@ -169,6 +173,7 @@ public class Server{
 								}
 							} else if (message.getPlayer1().equals(t.clientName)) { // look for my thread
 								try {
+									System.out.println("S ending " + message.getPlayer1() + " (should be bob) with " + enemy.getUsername() + " as enemy");
 									t.out.writeObject(new Message(message.getPlayer1(), "Paired", enemy.getUsername(), message.getPlayer1grid()));
 								} catch (Exception e) {
 									e.printStackTrace();
@@ -178,6 +183,7 @@ public class Server{
 					}
 				} else {
 					userStack.push(new UserInfo(message.getPlayer1(), message.getPlayer1grid()));
+
 					for(ClientThread t : clients) {
 						if (t.clientName.equals(message.getPlayer1())) {
 							try {
@@ -193,11 +199,19 @@ public class Server{
 			public void playMove(Message message){
 				for(ClientThread t : clients) {
 					if(t.clientName.equals(message.getPlayer2())){
-						if(t.grid.get(message.getX()).get(message.getY()) == 'B'){
-							t.grid.get(message.getX()).set(message.getY(), 'H');
+						//get enemy's grid
+						ArrayList<ArrayList<Character>> grid = new ArrayList<>();
+						for(UserInfo userInfo : userInfos) {
+							if(userInfo.getUsername().equals(message.getPlayer2())){
+								grid.addAll(userInfo.getGrid());
+							}
+						}
+						System.out.println("Updating enemy's grid: " + grid);
+						if(grid.get(message.getX()).get(message.getY()) == 'B'){
+							grid.get(message.getX()).set(message.getY(), 'H');
 							updateClients(new Message(message.getPlayer1(), "Hit",message.getPlayer2()));
-						} else if(t.grid.get(message.getX()).get(message.getY()) == 'W'){
-							t.grid.get(message.getX()).set(message.getY(), 'M');
+						} else if(grid.get(message.getX()).get(message.getY()) == 'W'){
+							grid.get(message.getX()).set(message.getY(), 'M');
 							updateClients(new Message(message.getPlayer1(), "Miss",message.getPlayer2()));
 						}
 					}

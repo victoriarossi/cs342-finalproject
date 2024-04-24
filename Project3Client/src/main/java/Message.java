@@ -35,7 +35,6 @@ public class Message implements Serializable {
         this.player1 = player1;
         this.messageContent = messageContent;
         this.playingAI = false;
-        this.player2 = player1;
         this.player1grid = grid;
     }
 
@@ -43,15 +42,25 @@ public class Message implements Serializable {
         this.player1 = player1;
         this.messageContent = messageContent;
         this.playingAI = false;
-        this.player2 = player1;
+        this.player2 = player2;
         this.player1grid = grid;
     }
-
 
     public Message(int x, int y){
         this.x = x;
         this.y = y;
     }
+
+
+    public Message(String messageContent, String player1, String player2, int x, int y){
+        this.player1 = player1;
+        this.messageContent = messageContent;
+        this.playingAI = false;
+        this.player2 = player2;
+        this.x = x;
+        this.y = y;
+    }
+
     // getter to retrieve userID of the message
     public String getPlayer1() {
         return player1;

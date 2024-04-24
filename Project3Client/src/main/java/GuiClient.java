@@ -63,6 +63,7 @@ public class GuiClient extends Application{
 	boolean[][] occupied = new boolean[size][size];
 	private Button[][] buttons = new Button[size][size];  // Buttons array representing the board
 	private Button[][] buttons2 = new Button[size][size];  // Buttons array representing the board
+	private Button[][] buttons2Enemy = new Button[size][size];
 	String currUsername;
 	private boolean isHorizontal = true;
 	private boolean directionClicked = false;
@@ -110,6 +111,8 @@ public class GuiClient extends Application{
 //					else {
 						if("Paired".equals(msg.getMessageContent())){
 							enemy = msg.getPlayer2();
+							System.out.println(enemy);
+							System.out.println(currUsername);
 							ArrayList<ArrayList<Character>> newGrid = new ArrayList<>();
 							for (int i = 0; i < size; i++) {
 								ArrayList<Character> row = new ArrayList<>();
@@ -637,6 +640,7 @@ public class GuiClient extends Application{
 		}
 	}
 
+
 	private boolean canPlaceShip(int startX, int startY, ShipInfo ship) {
 		if (isHorizontal) {
 			for (int i = 0; i < ship.length; i++) {
@@ -707,12 +711,12 @@ public class GuiClient extends Application{
 		for (int x = 0; x < size; x++) {
 			for (int y = 0; y < size; y++) {
 				Button button = new Button();
-				System.out.println(grid.get(x).get(y));
+//				System.out.println(grid.get(x).get(y));
 				if(grid.get(x).get(y).equals('B')) {
 
 					button.setStyle("-fx-background-color: #000000;");
 				} else {
-					button.setStyle("-fx-background-color: #6F6F6F;");
+					button.setStyle("-fx-background-color: #77BAFC;");
 				}
 				button.setPrefSize(40, 40);  // Set preferred size of each button
 				int finalI = x;
@@ -726,28 +730,34 @@ public class GuiClient extends Application{
 			}
 		}
 
-//		GridPane grid2Pane = new GridPane();
-//		grid2Pane.setAlignment(Pos.TOP_CENTER);
-//		grid2Pane.setHgap(0);
-//		grid2Pane.setVgap(0);
+		GridPane gridPaneEnemy = new GridPane();
+		gridPaneEnemy.setAlignment(Pos.TOP_CENTER);
+		gridPaneEnemy.setHgap(0);
+		gridPaneEnemy.setVgap(0);
+
+		for (int x = 0; x < size; x++) {
+			for (int y = 0; y < size; y++) {
+				Button button = new Button();
+//				System.out.println(grid.get(x).get(y));
+				if(enemyGrid.get(x).get(y).equals('W')) { // water
+					button.setStyle("-fx-background-color: #77BAFC;");
+				} else if(enemyGrid.get(x).get(y).equals('H')){ // successful hit
+					button.setStyle("-fx-background-color: #FF4B33;");
+				} else if(enemyGrid.get(x).get(y).equals('M')){
+					button.setStyle("-fx-background-color: #DEEBFF;");
+				}
+				button.setPrefSize(40, 40);  // Set preferred size of each button
+				int finalI = x;
+				int finalJ = y;
+				button.setOnAction(e -> {
+					clientConnection.send(new Message("Move", currUsername, enemy, finalI, finalJ));
+				});
+				buttons2Enemy[x][y] = button;
+				gridPaneEnemy.add(button, y,  x);
+			}
+		}
 //
-//		for (int x = 0; x < size; x++) {
-//			for (int y = 0; y < size; y++) {
-//				Rectangle box = new Rectangle(x * 40, y * 40, 40, 40);
-//				if(enemyGrid.get(x).get(y) == 'B'){
-//					box.setFill(Color.BLACK);
-//				} else if(enemyGrid.get(x).get(y) == 'M'){
-//					box.setFill(Color.GRAY);
-//				} else if(enemyGrid.get(x).get(y) == 'W'){
-//					box.setFill(Color.BLUE);
-//				} else {
-//					box.setFill(Color.RED);
-//				}
-//				grid2Pane.add(box, x, y);
-//			}
-//		}
-//
-		root.getChildren().addAll(gridPane);
+		root.getChildren().addAll(gridPane, gridPaneEnemy);
 		root.setAlignment(Pos.CENTER);
 //		return new Scene(root, 800, 600);
 		primaryStage.setScene(new Scene(root, 800, 600));
