@@ -1,5 +1,6 @@
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Message implements Serializable {
     static final long serialVersionUID = 42L;
@@ -16,6 +17,7 @@ public class Message implements Serializable {
     private int y; // column
     private String userIDReceiver; // ID of user receiving a private message
     private boolean myTurn;
+    private List<ShipInfo> shipInfos;
 
     // Constructor to initialize message object with userID, message content, and type of message
 //    public Message(String player1, String player2) {
@@ -31,11 +33,12 @@ public class Message implements Serializable {
         this.player2 = player2;
     }
 
-    public Message(String player1, String messageContent, ArrayList<ArrayList<Character>> grid){
+    public Message(String player1, String messageContent, ArrayList<ArrayList<Character>> grid, List<ShipInfo> shipInfos){
         this.player1 = player1;
         this.messageContent = messageContent;
         this.playingAI = false;
         this.player1grid = grid;
+        this.shipInfos = shipInfos;
     }
 
     public Message(String player1, String messageContent, String player2, ArrayList<ArrayList<Character>> grid, Boolean myTurn){

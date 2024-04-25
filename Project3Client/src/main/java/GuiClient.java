@@ -352,7 +352,7 @@ public class GuiClient extends Application{
 		start.setOnAction(e -> {
 			gameStarted = true;
 			System.out.println("Start clicked");
-			clientConnection.send(new Message(currUsername, "Pair", grid));
+			clientConnection.send(new Message(currUsername, "Pair", grid, shipInfos));
 		});
 
 		if(placedShipsCounter != 5){
@@ -371,6 +371,7 @@ public class GuiClient extends Application{
 			shipButton.setLayoutX(xOffset);
 			shipButton.setLayoutY(20);
 			ShipInfo shipInfo = new ShipInfo(shipButton, length);
+			shipInfo.counter = length;
 			shipInfos.add(shipInfo);
 			shipContainer.getChildren().add(shipButton); // adds ship to the container
 
@@ -467,11 +468,10 @@ public class GuiClient extends Application{
 		String shipLength = String.valueOf(ship.length);
 		if (isHorizontal) {
 			for (int i = 0; i < ship.length; i++) {
-
 				buttons[startX + i][startY].setText(shipLength);  // Mark the button as part of a ship
 				occupied[startX + i][startY] = true;  // Mark cells as occupied
 				buttons[startX + i][startY].setStyle("-fx-background-color: navy; -fx-text-fill: white");
-				grid.get(startY).set(startX + i, 'B');
+				grid.get(startY).set(startX + i, (char) ship.length);
 			}
 		}
 		else {
@@ -480,7 +480,7 @@ public class GuiClient extends Application{
 				buttons[startX][startY + i].setText(shipLength);  // Mark the grid cell as occupied
 				occupied[startX][startY + i] = true;  // Mark the cell as occupied
 				buttons[startX][startY + i].setStyle("-fx-background-color: navy; -fx-text-fill: white");
-				grid.get(startY + i).set(startX, 'B');
+				grid.get(startY + i).set(startX, (char) ship.length);
 			}
 		}
 	}

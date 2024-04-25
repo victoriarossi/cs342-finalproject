@@ -143,7 +143,7 @@ public class Server{
 				if(!userStack.empty()) {
 					UserInfo enemy = userStack.pop();
 					userInfos.add(enemy);
-					userInfos.add(new UserInfo(message.getPlayer1(),message.getPlayer1grid()));
+					userInfos.add(new UserInfo(message.getPlayer1(),message.getPlayer1grid(), message.getShipsInfo()));
 //					System.out.println("user: " + message.getPlayer1() + " enemy: " + enemy.getUsername());
 					if (!enemy.getUsername().equals(message.getPlayer1())) {
 						// go over the threads and look for the enemy's thread
@@ -170,7 +170,7 @@ public class Server{
 						}
 					}
 				} else {
-					userStack.push(new UserInfo(message.getPlayer1(), message.getPlayer1grid()));
+					userStack.push(new UserInfo(message.getPlayer1(), message.getPlayer1grid(), message.getShipsInfo()));
 
 					for(ClientThread t : clients) {
 						if (t.clientName.equals(message.getPlayer1())) {
@@ -189,15 +189,27 @@ public class Server{
 					if(t.clientName.equals(message.getPlayer2())){
 						//get enemy's grid
 						ArrayList<ArrayList<Character>> grid = new ArrayList<>();
+						List<ShipInfo> shipInfos;
 						for(UserInfo userInfo : userInfos) {
 							if(userInfo.getUsername().equals(message.getPlayer2())){
 								grid.addAll(userInfo.getGrid());
+								shipInfos = userInfo.getShipInfos();
 							}
 						}
 						System.out.println("Updating enemy's grid: " + grid);
-						if(grid.get(message.getX()).get(message.getY()) == 'B'){
+						ArrayList<Character> arr = new ArrayList<>(Arrays.asList('5', '4', '3', '2'));
+						if(arr.contains(grid.get(message.getX()).get(message.getY()))){
 							grid.get(message.getX()).set(message.getY(), 'H');
-							updateClients(new Message("Hit", message.getPlayer1(),message.getPlayer2(), message.getX(), message.getY(), false));
+							//look for the correct ship
+							for(ShipInfo ship: shipInfos){
+								if((char) ship.length == grid.get(message.getX()).get(message.getY()){
+									ship.counter--;
+								}
+								if(ship.counter == 0){
+									updateClients(new Message("Hit", message.getPlayer1(),message.getPlayer2(), message.getX(), message.getY(), false, ));
+								}
+							}
+
 							updateClients(new Message("Hit",message.getPlayer2(), message.getPlayer1(), message.getX(), message.getY(), true));
 						} else if(grid.get(message.getX()).get(message.getY()) == 'W'){
 							grid.get(message.getX()).set(message.getY(), 'M');
