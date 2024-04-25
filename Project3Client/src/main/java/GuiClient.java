@@ -16,6 +16,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.scene.image.Image;
@@ -39,6 +41,8 @@ public class GuiClient extends Application{
 
 	private String messageContent;
 	ListView<String> listItems2;
+
+	private boolean hasSelectedCell = false;
 	ListView<String> displayListUsers;
 
 	private ArrayList<ShipInfo> shipInfos = new ArrayList<>();
@@ -71,7 +75,7 @@ public class GuiClient extends Application{
 	String enemy;
 	Boolean myTurn = false;
 	Button hit;
-	Button flipButton = new Button("Flip");
+
 	Button NUKE;
 	Button deselect;
 
@@ -190,11 +194,15 @@ public class GuiClient extends Application{
 		NUKE = new Button("Hit");
 		NUKE.setStyle(btnStyle);
 		NUKE.setOnAction( e -> {
-			buttonsClickedCount = 0;
-			NUKE.setDisable(true);
-			clientConnection.send(new Message("Move", currUsername, enemy, xMove, yMove, false));
-
+			if (hasSelectedCell) {
+				buttonsClickedCount = 0;
+				NUKE.setDisable(true);
+				clientConnection.send(new Message("Move", currUsername, enemy, xMove, yMove, false));
+				hasSelectedCell = false;
+			}
 		});
+
+
 
 		// scene map for different scenes
 		sceneMap = new HashMap<String, Scene>();
@@ -207,6 +215,7 @@ public class GuiClient extends Application{
 		sceneMap.put("users", createViewUsersScene(primaryStage)); // adds the view users screen to scene map
 //		sceneMap.put("userVSUser", createuserVSUserScene(primaryStage)); // add the main game screen to scene map
 		sceneMap.put("waitingScene", createWaitingScene(primaryStage));
+		sceneMap.put("victoryScene", createVictoryScene(primaryStage));
 
 		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
@@ -217,7 +226,7 @@ public class GuiClient extends Application{
         });
 
 		primaryStage.setScene(sceneMap.get("startScene")); // starts the scene in the login scene
-		primaryStage.setTitle("Client");
+		primaryStage.setTitle("win");
 		primaryStage.show();
 	}
 
@@ -606,6 +615,7 @@ public class GuiClient extends Application{
 						handleGridClick(finalI, finalJ);
 						button.setDisable(true);
 						buttonsClickedCount++;
+						hasSelectedCell = true;
 					}
 				});
 				buttons2[x][y] = button;
@@ -638,6 +648,7 @@ public class GuiClient extends Application{
 						handleGridClick(finalI, finalJ);
 						button.setDisable(true);
 						buttonsClickedCount++;
+						hasSelectedCell = true;
 					}
 				});
 				buttons2Enemy[x][y] = button;
@@ -875,5 +886,34 @@ public class GuiClient extends Application{
 			}
 		});
 	}
+	private Scene createVictoryScene(Stage primaryStage) {
+		// Creating the Text for Victory Message
+		Text victoryText = new Text("Congratulations! You Win!");
+		victoryText.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+		victoryText.setFill(Color.YELLOW);
+
+		// Creating the Home Button
+		Button homeButton = new Button("Home");
+		homeButton.setOnAction(e -> {
+			// Action to go Home
+			System.out.println("Going home..."); // Replace with actual action to switch Scene
+		});
+
+		// Layout
+		VBox layout = new VBox(20); // 20 is the spacing between elements
+		layout.setAlignment(Pos.CENTER);
+		layout.getChildren().addAll(victoryText, homeButton);
+
+		// Set Background Image to fit the screen
+		BackgroundImage myBI = new BackgroundImage(new Image("loseImage.jpg"),
+				BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER,
+				new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, true, true, true, true));
+		layout.setBackground(new Background(myBI));
+
+		// Creating the Scene
+		Scene scene = new Scene(layout, 800, 600);
+		return scene;
+	}
+
 
 }
