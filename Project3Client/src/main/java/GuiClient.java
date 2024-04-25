@@ -42,6 +42,8 @@ public class GuiClient extends Application{
 
 	private String messageContent;
 	ListView<String> listItems2;
+
+	private boolean hasSelectedCell = false;
 	ListView<String> displayListUsers;
 
 	private ArrayList<ShipInfo> shipInfos = new ArrayList<>();
@@ -74,7 +76,7 @@ public class GuiClient extends Application{
 	String enemy;
 	Boolean myTurn = false;
 	Button hit;
-	Button flipButton = new Button("Flip");
+
 	Button NUKE;
 	Button deselect;
 
@@ -180,11 +182,15 @@ public class GuiClient extends Application{
 		NUKE = new Button("Hit");
 		NUKE.setStyle(btnStyle);
 		NUKE.setOnAction( e -> {
-			buttonsClickedCount = 0;
-			NUKE.setDisable(true);
-			clientConnection.send(new Message("Move", currUsername, enemy, xMove, yMove, false));
-
+			if (hasSelectedCell) {
+				buttonsClickedCount = 0;
+				NUKE.setDisable(true);
+				clientConnection.send(new Message("Move", currUsername, enemy, xMove, yMove, false));
+				hasSelectedCell = false;
+			}
 		});
+
+
 
 		// scene map for different scenes
 		sceneMap = new HashMap<String, Scene>();
@@ -207,7 +213,7 @@ public class GuiClient extends Application{
             }
         });
 
-		primaryStage.setScene(sceneMap.get("victoryScene")); // starts the scene in the login scene
+		primaryStage.setScene(sceneMap.get("startScene")); // starts the scene in the login scene
 		primaryStage.setTitle("win");
 		primaryStage.show();
 	}
@@ -453,28 +459,6 @@ public class GuiClient extends Application{
 			verticalBtn.setDisable(true);
 		}
 
-//		HBox.setMargin(horizontalBtn, new Insets(0, 0, 0, 10)); // Adds 10 pixels of margin to the left of horizontalBtn
-//		HBox.setMargin(verticalBtn, new Insets(0, 0, 0, 10)); // Adds 10 pixels of margin to the left of verticalBtn
-//		HBox layout1 = new HBox(20, horizontalBtn, verticalBtn);
-//
-//		Label placeShips = new Label("Place your ships:");
-//		placeShips.setStyle(subtitleStyle);
-//
-//		VBox.setMargin(start, new Insets(0, 0, 0, 10));
-//		VBox.setMargin(placeShips, new Insets(0, 0, 0, 10));
-//
-//		root.getChildren().addAll(placeShips, shipContainer, layout1, start);
-//		BorderPane newPane = new BorderPane();
-//		newPane.setCenter(gridPane);
-//		newPane.setBottom(root);
-//		newPane.setTop(backBtn);
-//
-//		Scene scene = new Scene(newPane, 800, 600);
-//		primaryStage.setTitle("Battleship Game");
-//		primaryStage.setScene(scene);
-//		primaryStage.show();
-////		return new Scene(pane, 800, 600);
-//		return scene;
 		horizontalBtn.setAlignment(Pos.CENTER);
 		verticalBtn.setAlignment(Pos.CENTER);
 		start.setAlignment(Pos.CENTER_RIGHT);
@@ -620,6 +604,7 @@ public class GuiClient extends Application{
 						handleGridClick(finalI, finalJ);
 						button.setDisable(true);
 						buttonsClickedCount++;
+						hasSelectedCell = true;
 					}
 				});
 				buttons2[x][y] = button;
@@ -652,6 +637,7 @@ public class GuiClient extends Application{
 						handleGridClick(finalI, finalJ);
 						button.setDisable(true);
 						buttonsClickedCount++;
+						hasSelectedCell = true;
 					}
 				});
 				buttons2Enemy[x][y] = button;
