@@ -1,8 +1,6 @@
 import java.awt.*;
 import java.util.HashMap;
-import java.util.List;
 import java.util.ArrayList;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -10,7 +8,6 @@ import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
@@ -23,8 +20,6 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-
-import javax.swing.plaf.synth.SynthOptionPaneUI;
 
 
 public class GuiClient extends Application{
@@ -77,6 +72,9 @@ public class GuiClient extends Application{
 	String enemy;
 	Boolean myTurn = false;
 	Button hit;
+	Button flipButton = new Button("Flip");
+	Button NUKE;
+	Button deselect;
 
 
 
@@ -111,9 +109,9 @@ public class GuiClient extends Application{
 						enemy = msg.getPlayer2();
 						myTurn = msg.getMyTurn();
 						if(myTurn){
-							hit.setDisable(false);
+							NUKE.setDisable(false);
 						} else {
-							hit.setDisable(true);
+							NUKE.setDisable(true);
 						}
 
 						createUserVSUserScene(primaryStage, grid);
@@ -128,10 +126,10 @@ public class GuiClient extends Application{
 						enemyGrid.get(msg.getX()).set(msg.getY(), 'H');
 						myTurn = msg.getMyTurn();
 						if(myTurn){
-							hit.setDisable(false);
+							NUKE.setDisable(false);
 						} else {
 							shipEnemyInfos.addAll(msg.getShipInfo());
-							hit.setDisable(true);
+							NUKE.setDisable(true);
 						}
 						updateGridCell(msg.getX(), msg.getY(), msg.getMessageContent());
 
@@ -141,10 +139,10 @@ public class GuiClient extends Application{
 						enemyGrid.get(msg.getX()).set(msg.getY(), 'M');
 						myTurn = msg.getMyTurn();
 						if(myTurn){
-							hit.setDisable(false);
+							NUKE.setDisable(false);
 						} else {
 							shipEnemyInfos.addAll(msg.getShipInfo());
-							hit.setDisable(true);
+							NUKE.setDisable(true);
 						}
 						updateGridCell(msg.getX(), msg.getY(), msg.getMessageContent());
 					}
@@ -171,11 +169,17 @@ public class GuiClient extends Application{
 			}
 		}
 
-		hit = new Button("Hit");
-		hit.setStyle(btnStyle);
-		hit.setOnAction( e -> {
+		deselect = new Button("Deselect");
+		deselect.setStyle(btnStyle);
+		deselect.setOnAction( e -> {
+
+		});
+
+		NUKE = new Button("Hit");
+		NUKE.setStyle(btnStyle);
+		NUKE.setOnAction( e -> {
 			buttonsClickedCount = 0;
-			hit.setDisable(true);
+			NUKE.setDisable(true);
 			clientConnection.send(new Message("Move", currUsername, enemy, xMove, yMove, false));
 
 		});
@@ -370,6 +374,7 @@ public class GuiClient extends Application{
 		for (int x = 0; x < size; x++) {
 			for (int y = 0; y < size; y++) {
 				Button button = new Button();
+				button.setStyle("-fx-background-color: #77BAFC;");
 				button.setPrefSize(40, 40);  // Set preferred size of each button
 				int finalI = x;
 				int finalJ = y;
@@ -386,7 +391,7 @@ public class GuiClient extends Application{
 
 //		BorderPane pane = new BorderPane();
 		Button backBtn = getBackBtn("options", primaryStage);
-		VBox root = new VBox(10);
+//		VBox root = new VBox(10);
 		Pane shipContainer = new Pane(); // container to hold all ships
 		shipContainer.setPrefSize(200, 60);
 
@@ -403,13 +408,16 @@ public class GuiClient extends Application{
 		}
 
 		horizontalBtn = new Button("Place Horizontally");
+		horizontalBtn.setStyle("-fx-background-color: #259EE8; -fx-text-fill: black; -fx-background-radius: 25px; -fx-padding: 14; -fx-cursor: hand; -fx-font-size: 18");
 		verticalBtn = new Button("Place Vertically");
+		verticalBtn.setStyle(btnStyle);
 
-		int xOffset = 10; // initial horizontal offset for first ship
+		int xOffset = 125; // initial horizontal offset for first ship
 		int[] shipLengths = {5, 4, 3, 3, 2}; // all ship lengths
 		for (int i = 0; i < shipLengths.length; i++) {
 			int length = shipLengths[i];
 			Button shipButton = new Button(String.valueOf(length));
+			shipButton.setStyle("-fx-background-color: #7B3F00; -fx-text-fill: white");
 			shipButton.setPrefSize(length * 30, 20);
 			shipButton.setLayoutX(xOffset);
 			shipButton.setLayoutY(20);
@@ -442,27 +450,51 @@ public class GuiClient extends Application{
 			verticalBtn.setDisable(true);
 		}
 
-		HBox.setMargin(horizontalBtn, new Insets(0, 0, 0, 10)); // Adds 10 pixels of margin to the left of horizontalBtn
-		HBox.setMargin(verticalBtn, new Insets(0, 0, 0, 10)); // Adds 10 pixels of margin to the left of verticalBtn
-		HBox layout1 = new HBox(20, horizontalBtn, verticalBtn);
+//		HBox.setMargin(horizontalBtn, new Insets(0, 0, 0, 10)); // Adds 10 pixels of margin to the left of horizontalBtn
+//		HBox.setMargin(verticalBtn, new Insets(0, 0, 0, 10)); // Adds 10 pixels of margin to the left of verticalBtn
+//		HBox layout1 = new HBox(20, horizontalBtn, verticalBtn);
+//
+//		Label placeShips = new Label("Place your ships:");
+//		placeShips.setStyle(subtitleStyle);
+//
+//		VBox.setMargin(start, new Insets(0, 0, 0, 10));
+//		VBox.setMargin(placeShips, new Insets(0, 0, 0, 10));
+//
+//		root.getChildren().addAll(placeShips, shipContainer, layout1, start);
+//		BorderPane newPane = new BorderPane();
+//		newPane.setCenter(gridPane);
+//		newPane.setBottom(root);
+//		newPane.setTop(backBtn);
+//
+//		Scene scene = new Scene(newPane, 800, 600);
+//		primaryStage.setTitle("Battleship Game");
+//		primaryStage.setScene(scene);
+//		primaryStage.show();
+////		return new Scene(pane, 800, 600);
+//		return scene;
+		horizontalBtn.setAlignment(Pos.CENTER);
+		verticalBtn.setAlignment(Pos.CENTER);
+		start.setAlignment(Pos.CENTER_RIGHT);
+		HBox placementButtons = new HBox(10, horizontalBtn, verticalBtn, start);
+		placementButtons.alignmentProperty().set(Pos.CENTER);
 
-		Label placeShips = new Label("Place your ships:");
-		placeShips.setStyle(subtitleStyle);
+		Label title = new Label("Prepare Your Ships");
+		title.setStyle(titleStyle);
 
-		VBox.setMargin(start, new Insets(0, 0, 0, 10));
-		VBox.setMargin(placeShips, new Insets(0, 0, 0, 10));
 
-		root.getChildren().addAll(placeShips, shipContainer, layout1, start);
+		VBox root = new VBox(20);
+		root.getChildren().addAll(title, gridPane, shipContainer, placementButtons);
 		BorderPane newPane = new BorderPane();
-		newPane.setCenter(gridPane);
-		newPane.setBottom(root);
+		newPane.setCenter(root);
 		newPane.setTop(backBtn);
+		newPane.setStyle("-fx-background-color: #C7FBFF; -fx-font-family: 'serif'");
+		root.setAlignment(Pos.CENTER);
+
 
 		Scene scene = new Scene(newPane, 800, 600);
 		primaryStage.setTitle("Battleship Game");
 		primaryStage.setScene(scene);
 		primaryStage.show();
-//		return new Scene(pane, 800, 600);
 		return scene;
 	}
 
@@ -512,12 +544,10 @@ public class GuiClient extends Application{
 			for (int i = 0; i < ship.length; i++) {
 				int x = startX + i;
 				int y = startY;
-
 				buttons[x][y].setText(shipLength);  // Mark the button as part of a ship
 				occupied[x][y] = true;  // Mark cells as occupied
 				buttons[x][y].setStyle("-fx-background-color: navy; -fx-text-fill: white");
 				grid.get(y).set(x, 'B');
-
 				ship.addPosition(y, x);
 			}
 //			System.out.println("ADDED SHIP: " + shipLength + " AT POSITION " + ship.positions);
@@ -527,12 +557,10 @@ public class GuiClient extends Application{
 			for (int i = 0; i < ship.length; i++) {
 				int x = startX;
 				int y = startY + i;
-
 				buttons[x][y].setText(shipLength);  // Mark the grid cell as occupied
 				occupied[x][y] = true;  // Mark the cell as occupied
 				buttons[x][y].setStyle("-fx-background-color: navy; -fx-text-fill: white");
 				grid.get(y).set(x, 'B');
-
 				ship.addPosition(y, x);
 			}
 		}
@@ -564,11 +592,6 @@ public class GuiClient extends Application{
 
 
 	private void createUserVSUserScene(Stage primaryStage, ArrayList<ArrayList<Character>> grid) {
-
-		HBox root = new HBox(20);
-
-//		root.setStyle("-fx-background-color: #C7FBFF; -fx-font-family: 'serif'");
-
 		GridPane gridPane = new GridPane();
 		gridPane.setAlignment(Pos.TOP_CENTER);
 		gridPane.setHgap(0);
@@ -638,11 +661,35 @@ public class GuiClient extends Application{
 		Color backgroundColor = Color.web("#C7FBFF");
 		pane.setBackground(new Background(new BackgroundFill(backgroundColor, CornerRadii.EMPTY, Insets.EMPTY)));
 
-		root.getChildren().addAll(gridPane, gridPaneEnemy);
+		Label title = new Label("HIT YOUR MARK!");
+		title.setStyle(titleStyle);
+
+		HBox GridLayer = new HBox(20);
+		GridLayer.getChildren().addAll(gridPane, gridPaneEnemy);
+		GridLayer.setAlignment(Pos.CENTER);
+		GridLayer.setPadding(new Insets(10));
+		pane.setCenter(GridLayer);
+
+
+		HBox ButtonLayer = new HBox(10);
+		NUKE.setPrefWidth(100);
+		deselect.setPrefWidth(100);
+		ButtonLayer.setAlignment(Pos.CENTER);
+
+
+		ButtonLayer.getChildren().addAll(NUKE, deselect);
+		pane.setCenter(ButtonLayer);
+
+
+		VBox root = new VBox(15);
+		root.getChildren().addAll(title, GridLayer, ButtonLayer);
 		root.setAlignment(Pos.CENTER);
+		root.setPadding(new Insets(30));
+
+
+
+		root.setStyle("-fx-background-color: #C7FBFF; -fx-font-family: 'serif'");
 		pane.setCenter(root);
-		pane.setBottom(hit);
-//		return new Scene(root, 800, 600);
 		primaryStage.setScene(new Scene(pane, 800, 600));
 	}
 
@@ -810,6 +857,30 @@ public class GuiClient extends Application{
 		pane.setCenter(waiting);
 
 		return new Scene(pane, 800, 600);
+	}
+
+	private void enableButtons() {
+		Platform.runLater(() -> {
+			// Enable buttons based on the enemy grid state
+			for (int x = 0; x < size; x++) {
+				for (int y = 0; y < size; y++) {
+					Button button = buttons2Enemy[x][y];
+					// Only enable the button if it corresponds to a 'W' cell, indicating untargeted water
+					button.setDisable(!(enemyGrid.get(x).get(y) == 'W'));
+				}
+			}
+		});
+	}
+
+	private void disableButtons() {
+		Platform.runLater(() -> {
+			// Disable all buttons in the enemy grid
+			for (int x = 0; x < size; x++) {
+				for (int y = 0; y < size; y++) {
+					buttons2Enemy[x][y].setDisable(true);
+				}
+			}
+		});
 	}
 
 }

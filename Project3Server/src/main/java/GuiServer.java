@@ -63,15 +63,15 @@ public class GuiServer extends Application{
 
 		BorderPane pane = new BorderPane();
 
-		Label title = new Label("Server Messaging:");
+		Label title = new Label("Server Log:");
 		title.setStyle("-fx-font-size: 24; -fx-font-weight: bold");
 		VBox vbox = new VBox(20,title, listItems);
-		vbox.setAlignment(Pos.CENTER);
+		vbox.setAlignment(Pos.CENTER_LEFT);
 		pane.setPadding(new Insets(70));
 
 		pane.setCenter(vbox);
 		pane.setStyle("-fx-font-family: 'serif'");
-		Color backgroundColor = Color.web("#F4DAB3");
+		Color backgroundColor = Color.web("#77BAFC");
 		pane.setBackground(new Background(new BackgroundFill(backgroundColor, CornerRadii.EMPTY, Insets.EMPTY)));
 		return new Scene(pane, 500, 400);
 	}
