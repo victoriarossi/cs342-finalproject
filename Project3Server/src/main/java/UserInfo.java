@@ -4,17 +4,17 @@ import java.util.List;
 public class UserInfo {
 	String username;
 	ArrayList<ArrayList<Character>> grid;
-//	ArrayList<ShipInfo> shipInfoList;
+	ArrayList<ShipInfo> shipInfoList;
 
-//	public UserInfo(String username, ArrayList<ArrayList<Character>> grid, ArrayList<ShipInfo> shipInfoList) {
-//		this.username = username;
-//		this.grid = grid;
-//		this.shipInfoList = shipInfoList;
-//	}
-public UserInfo(String username, ArrayList<ArrayList<Character>> grid) {
-	this.username = username;
-	this.grid = grid;
-}
+	public UserInfo(String username, ArrayList<ArrayList<Character>> grid, ArrayList<ShipInfo> shipInfoList) {
+		this.username = username;
+		this.grid = grid;
+		this.shipInfoList = shipInfoList;
+	}
+//public UserInfo(String username, ArrayList<ArrayList<Character>> grid) {
+//	this.username = username;
+//	this.grid = grid;
+//}
 
 	public String getUsername() {
 		return username;
@@ -24,7 +24,7 @@ public UserInfo(String username, ArrayList<ArrayList<Character>> grid) {
 		return grid;
 	}
 
-//	public ArrayList<ShipInfo> getShipInfoList(){
-//		return shipInfoList;
-//	}
+	public ArrayList<ShipInfo> getShipInfoList(){
+		return shipInfoList;
+	}
 }

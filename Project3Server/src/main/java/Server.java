@@ -144,8 +144,8 @@ public class Server{
 				if(!userStack.empty()) {
 					UserInfo enemy = userStack.pop();
 					userInfos.add(enemy);
-//					userInfos.add(new UserInfo(message.getPlayer1(),message.getPlayer1grid(), message.getShipInfo()));
-					userInfos.add(new UserInfo(message.getPlayer1(),message.getPlayer1grid()));
+					userInfos.add(new UserInfo(message.getPlayer1(),message.getPlayer1grid(), message.getShipInfo()));
+//					userInfos.add(new UserInfo(message.getPlayer1(),message.getPlayer1grid()));
 //					System.out.println("user: " + message.getPlayer1() + " enemy: " + enemy.getUsername());
 					if (!enemy.getUsername().equals(message.getPlayer1())) {
 						// go over the threads and look for the enemy's thread
@@ -172,8 +172,8 @@ public class Server{
 						}
 					}
 				} else {
-//					userStack.push(new UserInfo(message.getPlayer1(), message.getPlayer1grid(), message.getShipInfo()));
-					userStack.push(new UserInfo(message.getPlayer1(), message.getPlayer1grid()));
+					userStack.push(new UserInfo(message.getPlayer1(), message.getPlayer1grid(), message.getShipInfo()));
+//					userStack.push(new UserInfo(message.getPlayer1(), message.getPlayer1grid()));
 
 					for(ClientThread t : clients) {
 						if (t.clientName.equals(message.getPlayer1())) {
@@ -192,21 +192,21 @@ public class Server{
 					if(t.clientName.equals(message.getPlayer2())){
 						//get enemy's grid
 						ArrayList<ArrayList<Character>> grid = new ArrayList<>();
-//						List<ShipInfo> shipInfoList = new ArrayList<>();
+						ArrayList<ShipInfo> shipInfoList = new ArrayList<>();
 						for(UserInfo userInfo : userInfos) {
 							if(userInfo.getUsername().equals(message.getPlayer2())){
-								grid.addAll(userInfo.getGrid());
-//								shipInfoList.addAll(userInfo.getShipInfoList());
+								grid = userInfo.getGrid();
+								shipInfoList.addAll(userInfo.getShipInfoList());
 							}
 						}
 						System.out.println("Updating enemy's grid: " + grid);
 						if(grid.get(message.getX()).get(message.getY()) == 'B'){
 							grid.get(message.getX()).set(message.getY(), 'H');
-							updateClients(new Message("Hit", message.getPlayer1(),message.getPlayer2(), message.getX(), message.getY(), false));
+							updateClients(new Message("Hit", message.getPlayer1(),message.getPlayer2(), message.getX(), message.getY(), false, shipInfoList));
 							updateClients(new Message("Hit",message.getPlayer2(), message.getPlayer1(), message.getX(), message.getY(), true));
 						} else if(grid.get(message.getX()).get(message.getY()) == 'W'){
 							grid.get(message.getX()).set(message.getY(), 'M');
-							updateClients(new Message("Miss", message.getPlayer1(),message.getPlayer2(), message.getX(), message.getY(), false));
+							updateClients(new Message("Miss", message.getPlayer1(),message.getPlayer2(), message.getX(), message.getY(), false, shipInfoList));
 							updateClients(new Message("Miss",message.getPlayer2(), message.getPlayer1(), message.getX(), message.getY(), true));
 						}
 

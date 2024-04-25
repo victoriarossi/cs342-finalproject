@@ -1,3 +1,6 @@
+import javafx.scene.control.Button;
+
+import java.awt.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -6,7 +9,7 @@ public class Message implements Serializable {
     static final long serialVersionUID = 42L;
 
     private String player1; // ID of player1
-    private String player2; // ID of player2
+    private String player2;  // ID of player2
     private boolean playingAI; // boolean to see if we are playing against the AI
     private String messageContent; // content of the message
     //    private MessageType messageType; // type of message (BROADCAST = ALL USERS OR PRIVATE = SINGLE USER)
@@ -33,7 +36,7 @@ public class Message implements Serializable {
         this.player2 = player2;
     }
 
-    public Message(String player1, String messageContent, ArrayList<ArrayList<Character>> grid){
+    public Message(String player1, String messageContent, ArrayList<ArrayList<Character>> grid, ArrayList<ShipInfo> shipInfos){
         this.player1 = player1;
         this.messageContent = messageContent;
         this.playingAI = false;
@@ -74,6 +77,17 @@ public class Message implements Serializable {
         this.x = x;
         this.y = y;
         this.myTurn = myTurn;
+    }
+
+    public Message(String messageContent, String player1, String player2, int x, int y, Boolean myTurn, ArrayList<ShipInfo> shipInfos){
+        this.player1 = player1;
+        this.messageContent = messageContent;
+        this.playingAI = false;
+        this.player2 = player2;
+        this.x = x;
+        this.y = y;
+        this.myTurn = myTurn;
+        this.shipInfos = shipInfos;
     }
 
 
@@ -141,5 +155,6 @@ public class Message implements Serializable {
     public String toString(){
         return player1 + messageContent + player2;
     }
+
 
 }

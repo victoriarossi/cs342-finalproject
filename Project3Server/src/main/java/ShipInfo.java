@@ -1,11 +1,12 @@
 import javafx.scene.control.Button;
 
 import java.awt.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-class ShipInfo {
-    Button shipButton;
+class ShipInfo implements Serializable {
+    transient Button shipButton;
     int length;
     boolean isPlaced = false;
 
@@ -25,9 +26,9 @@ class ShipInfo {
     }
 
     // Method to record a hit and check if the ship is sunk
-    public boolean recordHit() {
+    public void recordHit() {
         hits++;
-        return isSunk();
+//        return isSunk();
     }
 
     public boolean isSunk() {

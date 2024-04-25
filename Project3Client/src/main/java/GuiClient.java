@@ -24,6 +24,8 @@ import javafx.stage.WindowEvent;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
+import javax.swing.plaf.synth.SynthOptionPaneUI;
+
 
 public class GuiClient extends Application{
 	TextField usernameField = new TextField();
@@ -46,6 +48,7 @@ public class GuiClient extends Application{
 	ListView<String> displayListUsers;
 
 	private ArrayList<ShipInfo> shipInfos = new ArrayList<>();
+	private ArrayList<ShipInfo> shipEnemyInfos = new ArrayList<>();
 	ListView<String> displayListItems;
 	ObservableList<String> storeUsersInListView;
 	private ArrayList<ArrayList<Character>> grid;
@@ -127,6 +130,7 @@ public class GuiClient extends Application{
 						if(myTurn){
 							hit.setDisable(false);
 						} else {
+							shipEnemyInfos.addAll(msg.getShipInfo());
 							hit.setDisable(true);
 						}
 						updateGridCell(msg.getX(), msg.getY(), msg.getMessageContent());
@@ -139,6 +143,7 @@ public class GuiClient extends Application{
 						if(myTurn){
 							hit.setDisable(false);
 						} else {
+							shipEnemyInfos.addAll(msg.getShipInfo());
 							hit.setDisable(true);
 						}
 						updateGridCell(msg.getX(), msg.getY(), msg.getMessageContent());
@@ -225,8 +230,14 @@ public class GuiClient extends Application{
 				// Update the button on the user's grid UI to reflect the hit or miss
 
 				ShipInfo ship = findShipAt(x, y);
+				System.out.println("STATUS: " + status);
+				System.out.println("SHIP: " + ship);
 				if (ship != null && status == 'H') {
-					if (ship.recordHit() && ship.isSunk()) {
+					System.out.println("HITS: " + ship.hits);
+					ship.recordHit();
+					System.out.println("HITS: " + ship.hits);
+					if (ship.isSunk()) {
+						System.out.println("RECORDED AND SUNK");
 						highlightSunkShip(ship, myTurn);
 					}
 				}
@@ -235,9 +246,12 @@ public class GuiClient extends Application{
 	}
 
 	private ShipInfo findShipAt(int x, int y) {
-		for (ShipInfo ship : shipInfos) {  // Assuming shipInfos holds all ships
+		for (ShipInfo ship : shipEnemyInfos) {  // Assuming shipInfos holds all ships
+			System.out.println(ship.length + " positions: " + ship.positions);
 			for (Point pos : ship.getPositions()) {
 				if (pos.x == x && pos.y == y) {
+					System.out.println("FOUND SHIP");
+					System.out.println("POS: " + pos.x + ", " + pos.y);
 					return ship;
 				}
 			}
@@ -246,7 +260,7 @@ public class GuiClient extends Application{
 	}
 
 	private void highlightSunkShip(ShipInfo ship, boolean myTurn) {
-		Button[][] targetButtons = myTurn ? buttons2 : buttons2Enemy;
+		Button[][] targetButtons = myTurn ? buttons2: buttons2Enemy;
 		for (Point part : ship.getPositions()) {
 			Button btn = targetButtons[part.x][part.y];  // Adjust if you need to update the enemy's grid instead
 			btn.setStyle("-fx-background-color: darkred;");
@@ -381,7 +395,7 @@ public class GuiClient extends Application{
 		start.setOnAction(e -> {
 			gameStarted = true;
 			System.out.println("Start clicked");
-			clientConnection.send(new Message(currUsername, "Pair", grid));
+			clientConnection.send(new Message(currUsername, "Pair", grid, shipInfos));
 		});
 
 		if(placedShipsCounter != 5){
@@ -504,8 +518,9 @@ public class GuiClient extends Application{
 				buttons[x][y].setStyle("-fx-background-color: navy; -fx-text-fill: white");
 				grid.get(y).set(x, 'B');
 
-//				ship.addPosition(x, y);
+				ship.addPosition(y, x);
 			}
+//			System.out.println("ADDED SHIP: " + shipLength + " AT POSITION " + ship.positions);
 		}
 		else {
 			// Place ship vertically
@@ -518,7 +533,7 @@ public class GuiClient extends Application{
 				buttons[x][y].setStyle("-fx-background-color: navy; -fx-text-fill: white");
 				grid.get(y).set(x, 'B');
 
-//				ship.addPosition(x, y);
+				ship.addPosition(y, x);
 			}
 		}
 
