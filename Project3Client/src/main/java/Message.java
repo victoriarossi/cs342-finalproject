@@ -12,7 +12,7 @@ public class Message implements Serializable {
     private String player2;  // ID of player2
     private boolean playingAI; // boolean to see if we are playing against the AI
     private String messageContent; // content of the message
-//    private MessageType messageType; // type of message (BROADCAST = ALL USERS OR PRIVATE = SINGLE USER)
+    //    private MessageType messageType; // type of message (BROADCAST = ALL USERS OR PRIVATE = SINGLE USER)
     private ArrayList<ArrayList<Character>> player1grid; // grid of boats of player 1. 'W' : water, 'B' : boat, 'H' : hit, 'M' : miss
     private ArrayList<ArrayList<Character>> player2grid; // grid of boats of player 2
     // move of the play
@@ -36,10 +36,10 @@ public class Message implements Serializable {
         this.player2 = player2;
     }
 
-    public Message(String player1, String messageContent, ArrayList<ArrayList<Character>> grid, ArrayList<ShipInfo> shipInfos){
+    public Message(String player1, String messageContent, ArrayList<ArrayList<Character>> grid, ArrayList<ShipInfo> shipInfos, boolean playingAI){
         this.player1 = player1;
         this.messageContent = messageContent;
-        this.playingAI = false;
+        this.playingAI = playingAI;
         this.player1grid = grid;
         this.shipInfos = shipInfos;
     }
@@ -88,6 +88,15 @@ public class Message implements Serializable {
         this.y = y;
         this.myTurn = myTurn;
         this.shipInfos = shipInfos;
+    }
+
+
+    public Message(String player1, String messageContent, String player2, Boolean playingAI, Boolean myTurn, ArrayList<ShipInfo> shipInfos){
+        this.player1 = player1;
+        this.messageContent = messageContent;
+        this.playingAI = playingAI;
+        this.player2 = player2;
+        this.myTurn = myTurn;
     }
 
 
@@ -150,6 +159,11 @@ public class Message implements Serializable {
     // getter to get the ShipInfo list
     public ArrayList<ShipInfo> getShipInfo(){
         return shipInfos;
+    }
+
+    // getter to get if we are playing the AI or not
+    public boolean getPlayingAI(){
+        return playingAI;
     }
 
     public String toString(){

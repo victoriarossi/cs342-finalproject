@@ -32,9 +32,8 @@ public class GuiClient extends Application{
 	private String selectedUser = "";
 
 	private boolean gameStarted = false;
+	private boolean playingAI = false;
 
-	TextField waiting;
-	Button b1;
 	HashMap<String, Scene> sceneMap;
 	Client clientConnection;
 
@@ -121,6 +120,13 @@ public class GuiClient extends Application{
 					if ("Waiting".equals(msg.getMessageContent()) && msg.getPlayer1().equals(currUsername)){
 //							System.out.println(grid);
 						primaryStage.setScene(sceneMap.get("waitingScene"));
+					}
+					if("AIConnected".equals(msg.getMessageContent())){
+						enemy = msg.getPlayer2();
+						myTurn = msg.getMyTurn();
+						shipEnemyInfos.addAll(msg.getShipInfo());
+						System.out.println("RETURNED AI");
+						createUserVSUserScene(primaryStage, grid);
 					}
 
 					if("Hit".equals(msg.getMessageContent())){
@@ -406,7 +412,8 @@ public class GuiClient extends Application{
 		start.setOnAction(e -> {
 			gameStarted = true;
 			System.out.println("Start clicked");
-			clientConnection.send(new Message(currUsername, "Pair", grid, shipInfos));
+			System.out.println("Sending current username: " + currUsername);
+			clientConnection.send(new Message(currUsername, "Pair", grid, shipInfos, playingAI));
 		});
 
 		if(placedShipsCounter != 5){
@@ -456,28 +463,6 @@ public class GuiClient extends Application{
 			verticalBtn.setDisable(true);
 		}
 
-//		HBox.setMargin(horizontalBtn, new Insets(0, 0, 0, 10)); // Adds 10 pixels of margin to the left of horizontalBtn
-//		HBox.setMargin(verticalBtn, new Insets(0, 0, 0, 10)); // Adds 10 pixels of margin to the left of verticalBtn
-//		HBox layout1 = new HBox(20, horizontalBtn, verticalBtn);
-//
-//		Label placeShips = new Label("Place your ships:");
-//		placeShips.setStyle(subtitleStyle);
-//
-//		VBox.setMargin(start, new Insets(0, 0, 0, 10));
-//		VBox.setMargin(placeShips, new Insets(0, 0, 0, 10));
-//
-//		root.getChildren().addAll(placeShips, shipContainer, layout1, start);
-//		BorderPane newPane = new BorderPane();
-//		newPane.setCenter(gridPane);
-//		newPane.setBottom(root);
-//		newPane.setTop(backBtn);
-//
-//		Scene scene = new Scene(newPane, 800, 600);
-//		primaryStage.setTitle("Battleship Game");
-//		primaryStage.setScene(scene);
-//		primaryStage.show();
-////		return new Scene(pane, 800, 600);
-//		return scene;
 		horizontalBtn.setAlignment(Pos.CENTER);
 		verticalBtn.setAlignment(Pos.CENTER);
 		start.setAlignment(Pos.CENTER_RIGHT);
@@ -487,7 +472,6 @@ public class GuiClient extends Application{
 		Label title = new Label("Prepare Your Ships");
 		title.setStyle(titleStyle);
 
-
 		VBox root = new VBox(20);
 		root.getChildren().addAll(title, gridPane, shipContainer, placementButtons);
 		BorderPane newPane = new BorderPane();
@@ -495,7 +479,6 @@ public class GuiClient extends Application{
 		newPane.setTop(backBtn);
 		newPane.setStyle("-fx-background-color: #C7FBFF; -fx-font-family: 'serif'");
 		root.setAlignment(Pos.CENTER);
-
 
 		Scene scene = new Scene(newPane, 800, 600);
 		primaryStage.setTitle("Battleship Game");
@@ -712,7 +695,11 @@ public class GuiClient extends Application{
 		playUserBtn.setOnAction(e -> {
 			primaryStage.setScene(sceneMap.get("setUpShipScene"));
 		});
-		playAIBtn.setOnAction(e -> primaryStage.setScene(sceneMap.get("setUpShipScene")));
+
+		playAIBtn.setOnAction(e -> {
+			playingAI = true;
+			primaryStage.setScene(sceneMap.get("setUpShipScene"));
+		});
 
 		VBox root = new VBox(40, playUserBtn, playAIBtn);
 		root.setStyle("-fx-background-color: #C7FBFF; -fx-font-family: 'serif'");
