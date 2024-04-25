@@ -1,5 +1,6 @@
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Message implements Serializable {
     static final long serialVersionUID = 42L;
@@ -16,6 +17,7 @@ public class Message implements Serializable {
     private int y; // column
     private String userIDReceiver; // ID of user receiving a private message
     private boolean myTurn;
+    private ArrayList<ShipInfo> shipInfos;
 
     // Constructor to initialize message object with userID, message content, and type of message
 //    public Message(String player1, String player2) {
@@ -36,6 +38,16 @@ public class Message implements Serializable {
         this.messageContent = messageContent;
         this.playingAI = false;
         this.player1grid = grid;
+    }
+
+    public Message(String player1, String messageContent, String player2, ArrayList<ArrayList<Character>> grid, Boolean myTurn, ArrayList<ShipInfo> shipInfos){
+        this.player1 = player1;
+        this.messageContent = messageContent;
+        this.playingAI = false;
+        this.player2 = player2;
+        this.player1grid = grid;
+        this.myTurn = myTurn;
+        this.shipInfos = shipInfos;
     }
 
     public Message(String player1, String messageContent, String player2, ArrayList<ArrayList<Character>> grid, Boolean myTurn){
@@ -62,6 +74,7 @@ public class Message implements Serializable {
         this.y = y;
         this.myTurn = myTurn;
     }
+
 
     // getter to retrieve userID of the message
     public String getPlayer1() {
@@ -117,6 +130,11 @@ public class Message implements Serializable {
     // getter to get y position of players move
     public int getY(){
         return y;
+    }
+
+    // getter to get the ShipInfo list
+    public ArrayList<ShipInfo> getShipInfo(){
+        return shipInfos;
     }
 
     public String toString(){

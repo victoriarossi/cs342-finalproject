@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 import java.util.function.Consumer;
 
@@ -143,6 +144,7 @@ public class Server{
 				if(!userStack.empty()) {
 					UserInfo enemy = userStack.pop();
 					userInfos.add(enemy);
+//					userInfos.add(new UserInfo(message.getPlayer1(),message.getPlayer1grid(), message.getShipInfo()));
 					userInfos.add(new UserInfo(message.getPlayer1(),message.getPlayer1grid()));
 //					System.out.println("user: " + message.getPlayer1() + " enemy: " + enemy.getUsername());
 					if (!enemy.getUsername().equals(message.getPlayer1())) {
@@ -161,7 +163,7 @@ public class Server{
 								}
 							} else if (message.getPlayer1().equals(t.clientName)) { // look for my thread
 								try {
-									System.out.println("S ending " + message.getPlayer1() + " (should be bob) with " + enemy.getUsername() + " as enemy");
+									System.out.println("Sending " + message.getPlayer1() + " (should be bob) with " + enemy.getUsername() + " as enemy");
 									t.out.writeObject(new Message(message.getPlayer1(), "Paired", enemy.getUsername(), message.getPlayer1grid(), false));
 								} catch (Exception e) {
 									e.printStackTrace();
@@ -170,6 +172,7 @@ public class Server{
 						}
 					}
 				} else {
+//					userStack.push(new UserInfo(message.getPlayer1(), message.getPlayer1grid(), message.getShipInfo()));
 					userStack.push(new UserInfo(message.getPlayer1(), message.getPlayer1grid()));
 
 					for(ClientThread t : clients) {
@@ -189,9 +192,11 @@ public class Server{
 					if(t.clientName.equals(message.getPlayer2())){
 						//get enemy's grid
 						ArrayList<ArrayList<Character>> grid = new ArrayList<>();
+//						List<ShipInfo> shipInfoList = new ArrayList<>();
 						for(UserInfo userInfo : userInfos) {
 							if(userInfo.getUsername().equals(message.getPlayer2())){
 								grid.addAll(userInfo.getGrid());
+//								shipInfoList.addAll(userInfo.getShipInfoList());
 							}
 						}
 						System.out.println("Updating enemy's grid: " + grid);

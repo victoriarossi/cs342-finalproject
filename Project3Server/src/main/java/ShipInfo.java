@@ -1,12 +1,10 @@
 import javafx.scene.control.Button;
 
 import java.awt.*;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-class ShipInfo implements Serializable{
-    static final long serialVersionUID = 42L;
+class ShipInfo {
     Button shipButton;
     int length;
     boolean isPlaced = false;

@@ -1,3 +1,4 @@
+import java.awt.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ public class GuiClient extends Application{
 	ListView<String> listItems2;
 	ListView<String> displayListUsers;
 
-	private List<ShipInfo> shipInfos = new ArrayList<>();
+	private ArrayList<ShipInfo> shipInfos = new ArrayList<>();
 	ListView<String> displayListItems;
 	ObservableList<String> storeUsersInListView;
 	private ArrayList<ArrayList<Character>> grid;
@@ -72,7 +73,6 @@ public class GuiClient extends Application{
 	private int placedShipsCounter = 0;
 	String enemy;
 	Boolean myTurn = false;
-	Button flipButton = new Button("Flip");
 	Button hit;
 
 
@@ -205,6 +205,9 @@ public class GuiClient extends Application{
 			// Determine if the update is for the user's grid or enemy's grid
 			if (result.equals("Hit") || result.equals("Miss")) {
 				char status = result.equals("Hit") ? 'H' : 'M';
+
+				//TODO: if is not my turn then set a new shipinfo for enemy
+
 				// Update the user's grid if the opponent hits
 				if (myTurn) {
 					grid.get(x).set(y, status);
@@ -218,10 +221,36 @@ public class GuiClient extends Application{
 					btn.setText(result.equals("Hit") ? "H" : "M");
 					btn.setStyle(result.equals("Hit") ? "-fx-background-color: red;" : "-fx-background-color: grey;");
 				}
+
 				// Update the button on the user's grid UI to reflect the hit or miss
 
+				ShipInfo ship = findShipAt(x, y);
+				if (ship != null && status == 'H') {
+					if (ship.recordHit() && ship.isSunk()) {
+						highlightSunkShip(ship, myTurn);
+					}
+				}
 			}
 		});
+	}
+
+	private ShipInfo findShipAt(int x, int y) {
+		for (ShipInfo ship : shipInfos) {  // Assuming shipInfos holds all ships
+			for (Point pos : ship.getPositions()) {
+				if (pos.x == x && pos.y == y) {
+					return ship;
+				}
+			}
+		}
+		return null;
+	}
+
+	private void highlightSunkShip(ShipInfo ship, boolean myTurn) {
+		Button[][] targetButtons = myTurn ? buttons2 : buttons2Enemy;
+		for (Point part : ship.getPositions()) {
+			Button btn = targetButtons[part.x][part.y];  // Adjust if you need to update the enemy's grid instead
+			btn.setStyle("-fx-background-color: darkred;");
+		}
 	}
 
 
@@ -467,22 +496,33 @@ public class GuiClient extends Application{
 		String shipLength = String.valueOf(ship.length);
 		if (isHorizontal) {
 			for (int i = 0; i < ship.length; i++) {
+				int x = startX + i;
+				int y = startY;
 
-				buttons[startX + i][startY].setText(shipLength);  // Mark the button as part of a ship
-				occupied[startX + i][startY] = true;  // Mark cells as occupied
-				buttons[startX + i][startY].setStyle("-fx-background-color: navy; -fx-text-fill: white");
-				grid.get(startY).set(startX + i, 'B');
+				buttons[x][y].setText(shipLength);  // Mark the button as part of a ship
+				occupied[x][y] = true;  // Mark cells as occupied
+				buttons[x][y].setStyle("-fx-background-color: navy; -fx-text-fill: white");
+				grid.get(y).set(x, 'B');
+
+//				ship.addPosition(x, y);
 			}
 		}
 		else {
 			// Place ship vertically
 			for (int i = 0; i < ship.length; i++) {
-				buttons[startX][startY + i].setText(shipLength);  // Mark the grid cell as occupied
-				occupied[startX][startY + i] = true;  // Mark the cell as occupied
-				buttons[startX][startY + i].setStyle("-fx-background-color: navy; -fx-text-fill: white");
-				grid.get(startY + i).set(startX, 'B');
+				int x = startX;
+				int y = startY + i;
+
+				buttons[x][y].setText(shipLength);  // Mark the grid cell as occupied
+				occupied[x][y] = true;  // Mark the cell as occupied
+				buttons[x][y].setStyle("-fx-background-color: navy; -fx-text-fill: white");
+				grid.get(y).set(x, 'B');
+
+//				ship.addPosition(x, y);
 			}
 		}
+
+//		ship.isPlaced = true;
 	}
 
 	private void resetGrid() {
@@ -755,30 +795,6 @@ public class GuiClient extends Application{
 		pane.setCenter(waiting);
 
 		return new Scene(pane, 800, 600);
-	}
-
-	private void enableButtons() {
-		Platform.runLater(() -> {
-			// Enable buttons based on the enemy grid state
-			for (int x = 0; x < size; x++) {
-				for (int y = 0; y < size; y++) {
-					Button button = buttons2Enemy[x][y];
-					// Only enable the button if it corresponds to a 'W' cell, indicating untargeted water
-					button.setDisable(!(enemyGrid.get(x).get(y) == 'W'));
-				}
-			}
-		});
-	}
-
-	private void disableButtons() {
-		Platform.runLater(() -> {
-			// Disable all buttons in the enemy grid
-			for (int x = 0; x < size; x++) {
-				for (int y = 0; y < size; y++) {
-					buttons2Enemy[x][y].setDisable(true);
-				}
-			}
-		});
 	}
 
 }
