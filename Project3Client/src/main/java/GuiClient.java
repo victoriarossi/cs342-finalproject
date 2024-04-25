@@ -109,8 +109,10 @@ public class GuiClient extends Application{
 						enemy = msg.getPlayer2();
 						myTurn = msg.getMyTurn();
 						if(myTurn){
+							enableButtons();
 							NUKE.setDisable(false);
 						} else {
+							disableButtons();
 							NUKE.setDisable(true);
 						}
 
@@ -126,8 +128,10 @@ public class GuiClient extends Application{
 						enemyGrid.get(msg.getX()).set(msg.getY(), 'H');
 						myTurn = msg.getMyTurn();
 						if(myTurn){
+							enableButtons();
 							NUKE.setDisable(false);
 						} else {
+							disableButtons();
 							shipEnemyInfos.addAll(msg.getShipInfo());
 							NUKE.setDisable(true);
 						}
@@ -139,8 +143,10 @@ public class GuiClient extends Application{
 						enemyGrid.get(msg.getX()).set(msg.getY(), 'M');
 						myTurn = msg.getMyTurn();
 						if(myTurn){
+							enableButtons();
 							NUKE.setDisable(false);
 						} else {
+							disableButtons();
 							shipEnemyInfos.addAll(msg.getShipInfo());
 							NUKE.setDisable(true);
 						}
