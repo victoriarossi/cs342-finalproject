@@ -33,7 +33,10 @@ public class GuiClient extends Application{
 
 	private String selectedUser = "";
 
+	private Button previouslySelectedBtn = null;
+
 	private boolean gameStarted = false;
+
 	private boolean playingAI = false;
 
 	HashMap<String, Scene> sceneMap;
@@ -74,12 +77,12 @@ public class GuiClient extends Application{
 	private int placedShipsCounter = 0;
 	String enemy;
 	Boolean myTurn = false;
+
+	int gameOverCheck = 0;
+
 	Button hit;
 
 	Button NUKE;
-	Button deselect;
-
-
 
 	// styling strings for different UI
 	String btnStyle = "-fx-background-color: #259EE8; -fx-text-fill: black; -fx-background-radius: 25px; -fx-padding: 14; -fx-cursor: hand; -fx-font-size: 18";
@@ -112,10 +115,10 @@ public class GuiClient extends Application{
 						enemy = msg.getPlayer2();
 						myTurn = msg.getMyTurn();
 						if(myTurn){
-							enableButtons();
+//							enableButtons();
 							NUKE.setDisable(false);
 						} else {
-							disableButtons();
+//							disableButtons();
 							NUKE.setDisable(true);
 						}
 
@@ -138,14 +141,14 @@ public class GuiClient extends Application{
 						enemyGrid.get(msg.getX()).set(msg.getY(), 'H');
 						myTurn = msg.getMyTurn();
 						if(myTurn){
-							enableButtons();
+//							enableButtons();
 							NUKE.setDisable(false);
 						} else {
-							disableButtons();
+//							disableButtons();
 							shipEnemyInfos.addAll(msg.getShipInfo());
 							NUKE.setDisable(true);
 						}
-						updateGridCell(msg.getX(), msg.getY(), msg.getMessageContent());
+						updateGridCell(msg.getX(), msg.getY(), msg.getMessageContent(), primaryStage);
 
 
 					} else if("Miss".equals(msg.getMessageContent())){
@@ -153,15 +156,16 @@ public class GuiClient extends Application{
 						enemyGrid.get(msg.getX()).set(msg.getY(), 'M');
 						myTurn = msg.getMyTurn();
 						if(myTurn){
-							enableButtons();
+//							enableButtons();
 							NUKE.setDisable(false);
 						} else {
-							disableButtons();
+//							disableButtons();
 							shipEnemyInfos.addAll(msg.getShipInfo());
 							NUKE.setDisable(true);
 						}
-						updateGridCell(msg.getX(), msg.getY(), msg.getMessageContent());
+						updateGridCell(msg.getX(), msg.getY(), msg.getMessageContent(), primaryStage);
 					}
+
 				}
 			});
 		});
@@ -184,12 +188,6 @@ public class GuiClient extends Application{
 				enemyGrid.get(i).add('W');
 			}
 		}
-
-		deselect = new Button("Deselect");
-		deselect.setStyle(btnStyle);
-		deselect.setOnAction( e -> {
-
-		});
 
 		NUKE = new Button("Hit");
 		NUKE.setStyle(btnStyle);
@@ -216,6 +214,7 @@ public class GuiClient extends Application{
 //		sceneMap.put("userVSUser", createuserVSUserScene(primaryStage)); // add the main game screen to scene map
 		sceneMap.put("waitingScene", createWaitingScene(primaryStage));
 		sceneMap.put("victoryScene", createVictoryScene(primaryStage));
+		sceneMap.put("losingScene", createLosingScene(primaryStage));
 
 		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
@@ -230,7 +229,7 @@ public class GuiClient extends Application{
 		primaryStage.show();
 	}
 
-	private void updateGridCell(int x, int y, String result) {
+	private void updateGridCell(int x, int y, String result, Stage primaryStage) {
 		Platform.runLater(() -> {
 			// Determine if the update is for the user's grid or enemy's grid
 			if (result.equals("Hit") || result.equals("Miss")) {
@@ -243,12 +242,14 @@ public class GuiClient extends Application{
 					grid.get(x).set(y, status);
 					Button btn = buttons2[x][y];
 					btn.setText(result.equals("Hit") ? "H" : "M");
+					btn.setDisable(true);
 					btn.setStyle(result.equals("Hit") ? "-fx-background-color: red;" : "-fx-background-color: grey;");
 				}
 				else {
 					enemyGrid.get(x).set(y, status);
 					Button btn = buttons2Enemy[x][y];
 					btn.setText(result.equals("Hit") ? "H" : "M");
+					btn.setDisable(true);
 					btn.setStyle(result.equals("Hit") ? "-fx-background-color: red;" : "-fx-background-color: grey;");
 				}
 
@@ -264,6 +265,10 @@ public class GuiClient extends Application{
 					if (ship.isSunk()) {
 						System.out.println("RECORDED AND SUNK");
 						highlightSunkShip(ship, myTurn);
+						gameOverCheck++;
+						if (gameOverCheck == 5) {
+							primaryStage.setScene(sceneMap.get("victoryScene"));
+						}
 					}
 				}
 			}
@@ -291,7 +296,6 @@ public class GuiClient extends Application{
 			btn.setStyle("-fx-background-color: darkred;");
 		}
 	}
-
 
 
 	public Button getBackBtn(String scene, Stage primaryStage){
@@ -583,9 +587,35 @@ public class GuiClient extends Application{
 		gameStarted = false;  // Reset game start flag
 	}
 
-	private void handleGridClick(int x, int y){
+	private boolean isPartOfSunkShip(int x, int y){
+		for( ShipInfo shipInfo: shipEnemyInfos){
+			if(shipInfo.getPositions().contains(new Point(x,y)) && shipInfo.isSunk()){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private void handleGridClick(int x, int y, Button clickedButton){
+		if (previouslySelectedBtn != null && previouslySelectedBtn != clickedButton) {
+			if(previouslySelectedBtn.getText() == "H") {
+				if (!isPartOfSunkShip(xMove, yMove))
+					previouslySelectedBtn.setStyle("-fx-background-color: #FF4B33;");
+				else
+					previouslySelectedBtn.setStyle("-fx-background-color: darkred;");
+			}
+			else
+				previouslySelectedBtn.setStyle("-fx-background-color: #77BAFC;");
+			if (!(previouslySelectedBtn.getText() == "H" || previouslySelectedBtn.getText() == "M")) {
+				previouslySelectedBtn.setDisable(false);
+			}
+		}
+		clickedButton.setStyle("-fx-background-color: #FFD700;");
+
 		xMove = x;
 		yMove = y;
+
+		previouslySelectedBtn = clickedButton;
 	}
 
 
@@ -610,13 +640,11 @@ public class GuiClient extends Application{
 				int finalI = x;
 				int finalJ = y;
 				button.setOnAction(e -> {
-					System.out.println("Counter Before Click: " + buttonsClickedCount);
-					if (buttonsClickedCount < 1) {
-						handleGridClick(finalI, finalJ);
-						button.setDisable(true);
-						buttonsClickedCount++;
-						hasSelectedCell = true;
-					}
+
+					handleGridClick(finalI, finalJ, button);
+					button.setDisable(true);
+					buttonsClickedCount++;
+					hasSelectedCell = true;
 				});
 				buttons2[x][y] = button;
 				gridPane.add(button, y,  x);
@@ -641,21 +669,16 @@ public class GuiClient extends Application{
 				button.setPrefSize(40, 40);  // Set preferred size of each button
 				int finalI = x;
 				int finalJ = y;
-
 				button.setOnAction(e -> {
-					System.out.println("Counter Enemy: " + buttonsClickedCount);
-					if (buttonsClickedCount < 1) {
-						handleGridClick(finalI, finalJ);
-						button.setDisable(true);
-						buttonsClickedCount++;
-						hasSelectedCell = true;
-					}
+					handleGridClick(finalI, finalJ, button);
+					button.setDisable(true);
+					buttonsClickedCount++;
+					hasSelectedCell = true;
 				});
 				buttons2Enemy[x][y] = button;
 				gridPaneEnemy.add(button, y,  x);
 			}
 		}
-
 
 		BorderPane pane = new BorderPane();
 		Color backgroundColor = Color.web("#C7FBFF");
@@ -673,11 +696,10 @@ public class GuiClient extends Application{
 
 		HBox ButtonLayer = new HBox(10);
 		NUKE.setPrefWidth(100);
-		deselect.setPrefWidth(100);
 		ButtonLayer.setAlignment(Pos.CENTER);
 
 
-		ButtonLayer.getChildren().addAll(NUKE, deselect);
+		ButtonLayer.getChildren().addAll(NUKE);
 		pane.setCenter(ButtonLayer);
 
 
@@ -863,29 +885,7 @@ public class GuiClient extends Application{
 		return new Scene(pane, 800, 600);
 	}
 
-	private void enableButtons() {
-		Platform.runLater(() -> {
-			// Enable buttons based on the enemy grid state
-			for (int x = 0; x < size; x++) {
-				for (int y = 0; y < size; y++) {
-					Button button = buttons2Enemy[x][y];
-					// Only enable the button if it corresponds to a 'W' cell, indicating untargeted water
-					button.setDisable(!(enemyGrid.get(x).get(y) == 'W'));
-				}
-			}
-		});
-	}
 
-	private void disableButtons() {
-		Platform.runLater(() -> {
-			// Disable all buttons in the enemy grid
-			for (int x = 0; x < size; x++) {
-				for (int y = 0; y < size; y++) {
-					buttons2Enemy[x][y].setDisable(true);
-				}
-			}
-		});
-	}
 	private Scene createVictoryScene(Stage primaryStage) {
 		// Creating the Text for Victory Message
 		Text victoryText = new Text("Congratulations! You Win!");
@@ -915,5 +915,32 @@ public class GuiClient extends Application{
 		return scene;
 	}
 
+	private Scene createLosingScene(Stage primaryStage) {
+		// Creating the Text for Victory Message
+		Text victoryText = new Text("LOSER! You LOST!");
+		victoryText.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+		victoryText.setFill(Color.YELLOW);
 
+		// Creating the Home Button
+		Button homeButton = new Button("Home");
+		homeButton.setOnAction(e -> {
+			// Action to go Home
+			System.out.println("Going home..."); // Replace with actual action to switch Scene
+		});
+
+		// Layout
+		VBox layout = new VBox(20); // 20 is the spacing between elements
+		layout.setAlignment(Pos.CENTER);
+		layout.getChildren().addAll(victoryText, homeButton);
+
+		// Set Background Image to fit the screen
+		BackgroundImage myBI = new BackgroundImage(new Image("loseImage.jpg"),
+				BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER,
+				new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, true, true, true, true));
+		layout.setBackground(new Background(myBI));
+
+		// Creating the Scene
+		Scene scene = new Scene(layout, 800, 600);
+		return scene;
+	}
 }

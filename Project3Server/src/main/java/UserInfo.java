@@ -11,10 +11,6 @@ public class UserInfo {
 		this.grid = grid;
 		this.shipInfoList = shipInfoList;
 	}
-//public UserInfo(String username, ArrayList<ArrayList<Character>> grid) {
-//	this.username = username;
-//	this.grid = grid;
-//}
 
 	public String getUsername() {
 		return username;
@@ -27,4 +23,6 @@ public class UserInfo {
 	public ArrayList<ShipInfo> getShipInfoList(){
 		return shipInfoList;
 	}
+
+
 }

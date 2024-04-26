@@ -202,8 +202,10 @@ public class Server{
 //								System.out.println(message.getPlayer1grid());
 							if(message.getPlayingAI()){
 								System.out.println("PLAYING AI");
+								System.out.println(message.getPlayer1());
 								// add thread to the list
 								AIThread ai = new AIThread(connection);
+								System.out.println(message.getPlayer1());
 								ais.add(ai);
 
 								userInfos.add(new UserInfo(ai.aiName, ai.grid, ai.shipInfos));
@@ -328,6 +330,7 @@ public class Server{
 							shipInfoList.addAll(userInfo.getShipInfoList());
 						}
 					}
+
 //					System.out.println("Updating enemy's grid: " + grid);
 					if(grid.get(message.getX()).get(message.getY()) == 'B'){
 						grid.get(message.getX()).set(message.getY(), 'H');
