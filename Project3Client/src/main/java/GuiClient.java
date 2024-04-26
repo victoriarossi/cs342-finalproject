@@ -108,59 +108,65 @@ public class GuiClient extends Application{
 					showAlert("Be original, Professor McCarty dislikes copycats!", primaryStage);
 				}
 				else {
-					if("Paired".equals(msg.getMessageContent())){
-						enemy = msg.getPlayer2();
-						myTurn = msg.getMyTurn();
-						if(myTurn){
-							enableButtons();
-							NUKE.setDisable(false);
-						} else {
-							disableButtons();
-							NUKE.setDisable(true);
-						}
+					if (playingAI) {
+						AI ai = new AI();
+						System.out.println("AIIIII");
 
-						createUserVSUserScene(primaryStage, grid);
-					}
-					if ("Waiting".equals(msg.getMessageContent()) && msg.getPlayer1().equals(currUsername)){
+					} else {
+						if ("Paired".equals(msg.getMessageContent())) {
+							enemy = msg.getPlayer2();
+							myTurn = msg.getMyTurn();
+							if (myTurn) {
+								enableButtons();
+								NUKE.setDisable(false);
+							} else {
+								disableButtons();
+								NUKE.setDisable(true);
+							}
+
+							createUserVSUserScene(primaryStage, grid);
+						}
+						if ("Waiting".equals(msg.getMessageContent()) && msg.getPlayer1().equals(currUsername)) {
 //							System.out.println(grid);
-						primaryStage.setScene(sceneMap.get("waitingScene"));
-					}
-					if("AIConnected".equals(msg.getMessageContent())){
-						enemy = msg.getPlayer2();
-						myTurn = msg.getMyTurn();
-						shipEnemyInfos.addAll(msg.getShipInfo());
-						System.out.println("RETURNED AI");
-						createUserVSUserScene(primaryStage, grid);
-					}
-
-					if("Hit".equals(msg.getMessageContent())){
-						//update enemy's grid
-						enemyGrid.get(msg.getX()).set(msg.getY(), 'H');
-						myTurn = msg.getMyTurn();
-						if(myTurn){
-							enableButtons();
-							NUKE.setDisable(false);
-						} else {
-							disableButtons();
-							shipEnemyInfos.addAll(msg.getShipInfo());
-							NUKE.setDisable(true);
+							primaryStage.setScene(sceneMap.get("waitingScene"));
 						}
-						updateGridCell(msg.getX(), msg.getY(), msg.getMessageContent());
+//					if("AIConnected".equals(msg.getMessageContent())){
+//						enemy = msg.getPlayer2();
+//						myTurn = msg.getMyTurn();
+//						shipEnemyInfos.addAll(msg.getShipInfo());
+//						System.out.println("RETURNED AI");
+//						createUserVSUserScene(primaryStage, grid);
+//					}
+
+						if ("Hit".equals(msg.getMessageContent())) {
+							//update enemy's grid
+							enemyGrid.get(msg.getX()).set(msg.getY(), 'H');
+							myTurn = msg.getMyTurn();
+							if (myTurn) {
+								enableButtons();
+								NUKE.setDisable(false);
+							} else {
+								disableButtons();
+								shipEnemyInfos.addAll(msg.getShipInfo());
+								NUKE.setDisable(true);
+							}
+							updateGridCell(msg.getX(), msg.getY(), msg.getMessageContent());
 
 
-					} else if("Miss".equals(msg.getMessageContent())){
-						//update enemy's grid
-						enemyGrid.get(msg.getX()).set(msg.getY(), 'M');
-						myTurn = msg.getMyTurn();
-						if(myTurn){
-							enableButtons();
-							NUKE.setDisable(false);
-						} else {
-							disableButtons();
-							shipEnemyInfos.addAll(msg.getShipInfo());
-							NUKE.setDisable(true);
+						} else if ("Miss".equals(msg.getMessageContent())) {
+							//update enemy's grid
+							enemyGrid.get(msg.getX()).set(msg.getY(), 'M');
+							myTurn = msg.getMyTurn();
+							if (myTurn) {
+								enableButtons();
+								NUKE.setDisable(false);
+							} else {
+								disableButtons();
+								shipEnemyInfos.addAll(msg.getShipInfo());
+								NUKE.setDisable(true);
+							}
+							updateGridCell(msg.getX(), msg.getY(), msg.getMessageContent());
 						}
-						updateGridCell(msg.getX(), msg.getY(), msg.getMessageContent());
 					}
 				}
 			});
