@@ -150,13 +150,15 @@ public class GuiClient extends Application{
 //							System.out.println(grid);
 							primaryStage.setScene(sceneMap.get("waitingScene"));
 						}
-						if ("AIConnected".equals(msg.getMessageContent())) {
-							enemy = msg.getPlayer2();
-							myTurn = msg.getMyTurn();
-							shipEnemyInfos.addAll(msg.getShipInfo());
-							System.out.println("RETURNED AI");
-							createUserVSUserScene(primaryStage, grid);
-						}
+
+//						if ("AIConnected".equals(msg.getMessageContent())) {
+//							enemy = msg.getPlayer2();
+//							myTurn = msg.getMyTurn();
+//							shipEnemyInfos.addAll(msg.getShipInfo());
+//							System.out.println("RETURNED AI");
+//							createUserVSUserScene(primaryStage, grid);
+//						}
+
 						if ("Win".equals(msg.getMessageContent())) {
 							System.out.println("I am the winner");
 //						if (msg.getPlayer1() == currUsername) {
@@ -500,7 +502,7 @@ public class GuiClient extends Application{
 			System.out.println("Start clicked");
 			System.out.println("Sending current username: " + currUsername);
 			if(!playingAI) {
-				clientConnection.send(new Message(currUsername, "Pair", grid, shipInfos, playingAI));
+				clientConnection.send(new Message(currUsername, "Pair", grid, shipInfos));
 			} else {
 				ai = new BattleshipAI();
 //				enemyGrid = ai.getGrid();
@@ -693,6 +695,20 @@ public class GuiClient extends Application{
 		ship.isPlaced = true;
 	}
 
+	private void initializeGrids(){
+		// initialize user's grid and enemy's grid with only water
+		grid = new ArrayList<>(size);
+		enemyGrid = new ArrayList<>(size);
+		for(int i = 0; i < size; i++){
+			grid.add(new ArrayList<>());
+			enemyGrid.add(new ArrayList<>());
+			for(int j = 0; j < size; j++){
+				grid.get(i).add('W');
+				enemyGrid.get(i).add('W');
+			}
+		}
+	}
+
 	private void resetGrid() {
 
 		for (int i = 0; i < size; i++) {
@@ -702,11 +718,18 @@ public class GuiClient extends Application{
 				occupied[i][j] = false;  // Reset the occupancy state
 			}
 		}
+
 		for (ShipInfo shipInfo : shipInfos) {
 			shipInfo.shipButton.setDisable(false);
 			shipInfo.shipButton.setStyle("-fx-background-color: #7B3F00; -fx-text-fill: white");
 			shipInfo.isPlaced = false;
+			shipInfo.hits = 0;
 		}
+
+		initializeGrids();
+		buttons2 = new Button[size][size];
+		buttons2Enemy = new Button[size][size];
+
 		gameStarted = false;  // Reset game start flag
 		undoShipBtn.setDisable(true);
 		start.setDisable(true);
@@ -997,8 +1020,10 @@ public class GuiClient extends Application{
 		homeButton.setOnAction(e -> {
 			// Action to go Home
 			resetGrid();
+			placedShipsCounter = 0;
 			primaryStage.setScene(sceneMap.get("options"));
 		});
+		homeButton.setStyle(btnStyle);
 
 		// Layout
 		VBox layout = new VBox(20); // 20 is the spacing between elements
@@ -1029,6 +1054,7 @@ public class GuiClient extends Application{
 		homeButton.setOnAction(e -> {
 			// Action to go Home
 			resetGrid();
+			placedShipsCounter = 0;
 			primaryStage.setScene(sceneMap.get("options"));
 		});
 

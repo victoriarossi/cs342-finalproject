@@ -36,10 +36,10 @@ public class Message implements Serializable {
         this.player2 = player2;
     }
 
-    public Message(String player1, String messageContent, ArrayList<ArrayList<Character>> grid, ArrayList<ShipInfo> shipInfos, boolean playingAI){
+    public Message(String player1, String messageContent, ArrayList<ArrayList<Character>> grid, ArrayList<ShipInfo> shipInfos){
         this.player1 = player1;
         this.messageContent = messageContent;
-        this.playingAI = playingAI;
+        this.playingAI = false;
         this.player1grid = grid;
         this.shipInfos = shipInfos;
     }

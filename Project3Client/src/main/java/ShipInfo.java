@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 class ShipInfo implements Serializable {
+
+    static final long serialVersionUID = 42L;
+
     transient Button shipButton;
     int length;
     boolean isPlaced = false;

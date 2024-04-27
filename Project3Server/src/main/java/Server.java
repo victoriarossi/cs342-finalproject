@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 public class Server{
 
 	ArrayList<ClientThread> clients = new ArrayList<ClientThread>();
-	ArrayList<AIThread> ais = new ArrayList<>();
+//	ArrayList<AIThread> ais = new ArrayList<>();
 	static ArrayList<String> clientID = new ArrayList<>();
 	TheServer server;
 
@@ -49,102 +49,6 @@ public class Server{
 				callback.accept("Server socket did not launch");
 			}
 
-		}
-	}
-
-	class AIThread extends Thread {
-		Socket connection;
-		ObjectInputStream in;
-		ObjectOutputStream out;
-
-		String aiName = "";
-		ArrayList<ArrayList<Character>> grid;
-		ArrayList<ShipInfo> shipInfos;
-
-		AIThread(Socket socket) {
-			this.connection = socket;
-			this.aiName = String.valueOf(count);
-			count++;
-
-			// initialize grid with water
-			grid = new ArrayList<>();
-			for(int i=0; i < 10; i++){
-				ArrayList row = new ArrayList<>();
-				for(int j=0; j < 10; j++){
-					row.add(j, 'W');
-				}
-				grid.add(row);
-			}
-
-			initializeGrid();
-		}
-
-		private void initializeGrid(){
-			//initialize randomize grid
-			int[] shipLengths = {5, 4, 3, 3, 2};
-			for (int i = 0; i < shipLengths.length; i++) {
-				Random random = new Random();
-				int x = random.nextInt(10);
-				int y = random.nextInt(10);
-				boolean isHorizontal = random.nextInt(2) == 0 ? true : false;
-				if(canPlaceShip(x, y, isHorizontal, shipLengths[i])){
-					placeShip(x, y, isHorizontal, shipLengths[i]);
-				}
-			}
-		}
-
-		private void placeShip(int startX, int startY, boolean isHorizontal, int length) {
-			ShipInfo ship = new ShipInfo(new Button(String.valueOf(length)), length);
-			if (isHorizontal) {
-				for (int i = 0; i < length; i++) {
-					int x = startX + i;
-					int y = startY;
-					grid.get(y).set(x, 'B');
-					ship.addPosition(y, x);
-				}
-			} else {
-				// Place ship vertically
-				for (int i = 0; i < length; i++) {
-					int x = startX;
-					int y = startY + i;
-					grid.get(y).set(x, 'B');
-					ship.addPosition(y, x);
-				}
-			}
-			shipInfos.add(ship);
-		}
-
-		private boolean canPlaceShip(int startX, int startY, boolean isHorizontal, int length) {
-			if (isHorizontal) {
-				for (int i = 0; i < length; i++) {
-					if (startX + i >= 10 || grid.get(startX + i).get(startY) == 'B') return false;  // Horizontal check
-				}
-			}
-			else {
-				for (int i = 0; i < length; i++) {
-					if (startY + i >= 10 || grid.get(startX).get(startY + i) == 'B') {
-						return false;
-					}
-				}
-			}
-			return true;
-		}
-
-		public void run() {
-			try {
-
-				// processes incoming messages from client
-				while (true) {
-					Message message = (Message) in.readObject(); // reads next message object from client
-
-					if ("Move".equals(message.getMessageContent())){
-						// do something
-					}
-				}
-
-			} catch (Exception e) {
-
-			}
 		}
 	}
 
@@ -196,41 +100,9 @@ public class Server{
 					}
 					else {
 						// forwards any other type of message to all clients
-//							updateClients(message);
 						if("Pair".equals(message.getMessageContent())){
-//								System.out.println(message.getPlayer1grid());
-							if(message.getPlayingAI()){
-								System.out.println("PLAYING AI");
-								System.out.println(message.getPlayer1());
-								// add thread to the list
-								AIThread ai = new AIThread(connection);
-								System.out.println(message.getPlayer1());
-								ais.add(ai);
-
-								userInfos.add(new UserInfo(ai.aiName, ai.grid, ai.shipInfos));
-								userInfos.add(new UserInfo(message.getPlayer1(),message.getPlayer1grid(), message.getShipInfo()));
-
-								//return to the user that the ai is connected with ai as player 2
-								updateClients(new Message(message.getPlayer1(), "AIConnected", ai.aiName, true, true, ai.shipInfos));
-								System.out.println(clients);
-//								for(ClientThread t : clients){
-//									System.out.println(t.clientName.equals(message.getPlayer1()));
-//									if(t.clientName.equals(message.getPlayer1())){
-//										System.out.println("CONNECTED");
-//
-//									}
-//								}
-								ai.start();
-							} else {
 								pairPlayers(message);
-							}
 						} else if("Move".equals(message.getMessageContent())){
-							// a player is playing a move
-//							if(message.getPlayingAI()){
-//								//playAIMove(message);
-//							} else {
-//								playMove(message);
-//							}
 							playMove(message);
 						}
 						else if ("Ship Sunk".equals(message.getMessageContent())) {
@@ -242,6 +114,7 @@ public class Server{
 				}
 			}
 			catch (Exception e) {
+				System.out.println("EXCEPTION: " + e.getMessage());
 
 				// checks if client had set a username
 				if (clientName != null && !clientName.isEmpty()) {
