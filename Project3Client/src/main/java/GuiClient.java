@@ -152,14 +152,6 @@ public class GuiClient extends Application{
 							primaryStage.setScene(sceneMap.get("waitingScene"));
 						}
 
-//						if ("AIConnected".equals(msg.getMessageContent())) {
-//							enemy = msg.getPlayer2();
-//							myTurn = msg.getMyTurn();
-//							shipEnemyInfos.addAll(msg.getShipInfo());
-//							System.out.println("RETURNED AI");
-//							createUserVSUserScene(primaryStage, grid);
-//						}
-
 						if ("Win".equals(msg.getMessageContent())) {
 							System.out.println("I am the winner");
 //						if (msg.getPlayer1() == currUsername) {
@@ -179,7 +171,7 @@ public class GuiClient extends Application{
 								shipEnemyInfos.addAll(msg.getShipInfo());
 								NUKE.setDisable(true);
 							}
-							updateGridCell(msg.getX(), msg.getY(), msg.getMessageContent());
+							updateGridCell(msg.getX(), msg.getY(), msg.getMessageContent(), primaryStage);
 
 						} else if ("Miss".equals(msg.getMessageContent())) {
 							//update enemy's grid
@@ -193,7 +185,7 @@ public class GuiClient extends Application{
 								shipEnemyInfos.addAll(msg.getShipInfo());
 								NUKE.setDisable(true);
 							}
-							updateGridCell(msg.getX(), msg.getY(), msg.getMessageContent());
+							updateGridCell(msg.getX(), msg.getY(), msg.getMessageContent(), primaryStage);
 						}
 					}
 				}
@@ -232,17 +224,18 @@ public class GuiClient extends Application{
 							if(position.x == xMove && position.y == yMove){
 								result = "Hit";
 //								System.out.println("IT WAS A HIT");
+//								theEShip.recordHit();
 								break;
 							}
 						}
 					}
 
 					System.out.println("IT WAS A " + result);
-					updateGridCell(xMove, yMove, result);
+					updateGridCell(xMove, yMove, result, primaryStage);
 					NUKE.setDisable(true);
 					//add waiting response
 					pause.play();
-					pause.setOnFinished(ev -> aiMakeMove());
+					pause.setOnFinished(ev -> aiMakeMove(primaryStage));
 
 				});
 			} else {
@@ -278,11 +271,11 @@ public class GuiClient extends Application{
         });
 
 		primaryStage.setScene(sceneMap.get("startScene")); // starts the scene in the login scene
-		primaryStage.setTitle("win");
+		primaryStage.setTitle(currUsername);
 		primaryStage.show();
 	}
 
-	private void aiMakeMove(){
+	private void aiMakeMove(Stage primaryStage){
 
 		Point aiHit = ai.makeAMove();
 		System.out.println("TRYING TO HIT: " + aiHit.x + " " + aiHit.y);
@@ -294,28 +287,25 @@ public class GuiClient extends Application{
 		myTurn = true;
 
 		String result = "Miss";
-
 		for(ShipInfo myShip : shipInfos) {
-
 			for (Point position : myShip.getPositions()) {
-
 				if (position.x == aiHit.x && position.y == aiHit.y) {
-
 					result = "Hit";
-
+//					myShip.recordHit();
 					break;
-
 				}
 			}
 		}
 		System.out.println("IT WAS A" + result);
-		updateGridCell(xMove, yMove, result);
+		// see if we won or not
+
+		updateGridCell(xMove, yMove, result, primaryStage);
 		NUKE.setDisable(false);
 		buttonsClickedCount--;
 
 	}
 
-	private void updateGridCell(int x, int y, String result) {
+	private void updateGridCell(int x, int y, String result, Stage primaryStage) {
 //		Platform.runLater(() -> {
 			System.out.println("RESULT on updateGridCell: " + result);
 
@@ -352,7 +342,16 @@ public class GuiClient extends Application{
 						highlightSunkShip(ship, myTurn);
 						gameOverCheck++;
 						if (gameOverCheck == 5) {
-							clientConnection.send(new Message(currUsername, "Ship Sunk", enemy));
+							if(playingAI){
+								if(!myTurn){ // NOT SURE ABOUT THIS, NEED TO ACTUALLY USE MY BRAIN
+									primaryStage.setScene(sceneMap.get("victoryScene"));
+								} else {
+									primaryStage.setScene(sceneMap.get("losingScene"));
+								}
+
+							} else {
+								clientConnection.send(new Message(currUsername, "Ship Sunk", enemy));
+							}
 						}
 					}
 				}
@@ -1033,6 +1032,7 @@ public class GuiClient extends Application{
 		homeButton.setOnAction(e -> {
 			// Action to go Home
 			resetGrid();
+			playingAI = false;
 			placedShipsCounter = 0;
 			primaryStage.setScene(sceneMap.get("options"));
 		});
