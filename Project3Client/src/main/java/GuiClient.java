@@ -88,11 +88,16 @@ public class GuiClient extends Application{
 
 	boolean whoWon = false;
 
-	Button hit;
 
 	Button NUKE;
 
 	Button undoShipBtn;
+
+	BattleshipAI ai;
+
+	GridPane gridPaneTest = new GridPane();
+
+	int aiShipSunk = 0;
 
 	// styling strings for different UI
 	String btnStyle = "-fx-background-color: #259EE8; -fx-text-fill: black; -fx-background-radius: 25px; -fx-padding: 14; -fx-cursor: hand; -fx-font-size: 18";
@@ -121,66 +126,72 @@ public class GuiClient extends Application{
 					showAlert("Be original, Professor McCarty dislikes copycats!", primaryStage);
 				}
 				else {
-					if("Paired".equals(msg.getMessageContent())){
-						enemy = msg.getPlayer2();
-						myTurn = msg.getMyTurn();
-						if(myTurn){
-//							enableButtons();
-							NUKE.setDisable(false);
-						} else {
-//							disableButtons();
-							NUKE.setDisable(true);
-						}
+					if (playingAI) {
 
-						createUserVSUserScene(primaryStage, grid);
-					}
-					if ("Waiting".equals(msg.getMessageContent()) && msg.getPlayer1().equals(currUsername)){
+						ai = new BattleshipAI();
+
+						// TODO: my turn and ai's turn
+
+					} else {
+						if ("Paired".equals(msg.getMessageContent())) {
+							enemy = msg.getPlayer2();
+							myTurn = msg.getMyTurn();
+							if (myTurn) {
+//							enableButtons();
+								NUKE.setDisable(false);
+							} else {
+//							disableButtons();
+								NUKE.setDisable(true);
+							}
+
+							createUserVSUserScene(primaryStage, grid);
+						}
+						if ("Waiting".equals(msg.getMessageContent()) && msg.getPlayer1().equals(currUsername)) {
 //							System.out.println(grid);
-						primaryStage.setScene(sceneMap.get("waitingScene"));
-					}
-					if("AIConnected".equals(msg.getMessageContent())){
-						enemy = msg.getPlayer2();
-						myTurn = msg.getMyTurn();
-						shipEnemyInfos.addAll(msg.getShipInfo());
-						System.out.println("RETURNED AI");
-						createUserVSUserScene(primaryStage, grid);
-					}
-					if ("Win".equals(msg.getMessageContent())) {
-						System.out.println("I am the winner");
+							primaryStage.setScene(sceneMap.get("waitingScene"));
+						}
+						if ("AIConnected".equals(msg.getMessageContent())) {
+							enemy = msg.getPlayer2();
+							myTurn = msg.getMyTurn();
+							shipEnemyInfos.addAll(msg.getShipInfo());
+							System.out.println("RETURNED AI");
+							createUserVSUserScene(primaryStage, grid);
+						}
+						if ("Win".equals(msg.getMessageContent())) {
+							System.out.println("I am the winner");
 //						if (msg.getPlayer1() == currUsername) {
 //							whoWon = true;
 //						}
 //						updateGridCell(msg.getX(), msg.getY(), msg.getMessageContent(), primaryStage);
-						primaryStage.setScene(sceneMap.get("victoryScene"));
-					}
-					else if ("Lose".equals(msg.getMessageContent())) {
-						primaryStage.setScene(sceneMap.get("losingScene"));
-					}
-					else if("Hit".equals(msg.getMessageContent())){
-						//update enemy's grid
-						enemyGrid.get(msg.getX()).set(msg.getY(), 'H');
-						myTurn = msg.getMyTurn();
-						if(myTurn){
-							NUKE.setDisable(false);
-						} else {
-							shipEnemyInfos.addAll(msg.getShipInfo());
-							NUKE.setDisable(true);
-						}
-						updateGridCell(msg.getX(), msg.getY(), msg.getMessageContent(), primaryStage);
+							primaryStage.setScene(sceneMap.get("victoryScene"));
+						} else if ("Lose".equals(msg.getMessageContent())) {
+							primaryStage.setScene(sceneMap.get("losingScene"));
+						} else if ("Hit".equals(msg.getMessageContent())) {
+							//update enemy's grid
+							enemyGrid.get(msg.getX()).set(msg.getY(), 'H');
+							myTurn = msg.getMyTurn();
+							if (myTurn) {
+								NUKE.setDisable(false);
+							} else {
+								shipEnemyInfos.addAll(msg.getShipInfo());
+								NUKE.setDisable(true);
+							}
+							updateGridCell(msg.getX(), msg.getY(), msg.getMessageContent());
 
-					} else if("Miss".equals(msg.getMessageContent())){
-						//update enemy's grid
-						enemyGrid.get(msg.getX()).set(msg.getY(), 'M');
-						myTurn = msg.getMyTurn();
-						if(myTurn){
+						} else if ("Miss".equals(msg.getMessageContent())) {
+							//update enemy's grid
+							enemyGrid.get(msg.getX()).set(msg.getY(), 'M');
+							myTurn = msg.getMyTurn();
+							if (myTurn) {
 //							enableButtons();
-							NUKE.setDisable(false);
-						} else {
+								NUKE.setDisable(false);
+							} else {
 //							disableButtons();
-							shipEnemyInfos.addAll(msg.getShipInfo());
-							NUKE.setDisable(true);
+								shipEnemyInfos.addAll(msg.getShipInfo());
+								NUKE.setDisable(true);
+							}
+							updateGridCell(msg.getX(), msg.getY(), msg.getMessageContent());
 						}
-						updateGridCell(msg.getX(), msg.getY(), msg.getMessageContent(), primaryStage);
 					}
 				}
 			});
@@ -208,11 +219,31 @@ public class GuiClient extends Application{
 		NUKE = new Button("Hit");
 		NUKE.setStyle(btnStyle);
 		NUKE.setOnAction( e -> {
-			if (hasSelectedCell) {
-				buttonsClickedCount = 0;
-				NUKE.setDisable(true);
-				clientConnection.send(new Message("Move", currUsername, enemy, xMove, yMove, false));
-				hasSelectedCell = false;
+			if(playingAI){
+				//TODO: play move on ai + add a waiting time
+				myTurn = true;
+				Platform.runLater(() -> {
+					String result = "Miss";
+					for(ShipInfo theEShip : shipEnemyInfos){
+						for(Point position : theEShip.getPositions()){
+							if(position.x == xMove && position.y == yMove){
+								result = "Hit";
+								break;
+							}
+						}
+					}
+
+					updateGridCell(xMove, yMove, result);
+					NUKE.setDisable(true);
+					aiMakeMove();
+				});
+			} else {
+				if (hasSelectedCell) {
+					buttonsClickedCount = 0;
+					NUKE.setDisable(true);
+					clientConnection.send(new Message("Move", currUsername, enemy, xMove, yMove, false));
+					hasSelectedCell = false;
+				}
 			}
 		});
 
@@ -229,6 +260,7 @@ public class GuiClient extends Application{
 		sceneMap.put("victoryScene", createVictoryScene(primaryStage));
 		sceneMap.put("losingScene", createLosingScene(primaryStage));
 
+
 		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent t) {
@@ -242,7 +274,36 @@ public class GuiClient extends Application{
 		primaryStage.show();
 	}
 
-	private void updateGridCell(int x, int y, String result, Stage primaryStage) {
+	private void aiMakeMove(){
+
+		Point aiHit = ai.makeAMove();
+
+		System.out.println("I AM AI");
+
+		myTurn = false;
+
+		String result = "Miss";
+
+		for(ShipInfo myShip : shipInfos) {
+
+			for (Point position : myShip.getPositions()) {
+
+				if (position.x == aiHit.x && position.y == aiHit.y) {
+
+					result = "Hit";
+
+					break;
+
+				}
+			}
+		}
+		updateGridCell(xMove, yMove, result);
+		NUKE.setDisable(false);
+		buttonsClickedCount--;
+
+	}
+
+	private void updateGridCell(int x, int y, String result) {
 		Platform.runLater(() -> {
 
 			// Determine if the update is for the user's grid or enemy's grid
@@ -438,7 +499,15 @@ public class GuiClient extends Application{
 			gameStarted = true;
 			System.out.println("Start clicked");
 			System.out.println("Sending current username: " + currUsername);
-			clientConnection.send(new Message(currUsername, "Pair", grid, shipInfos, playingAI));
+			if(!playingAI) {
+				clientConnection.send(new Message(currUsername, "Pair", grid, shipInfos, playingAI));
+			} else {
+				ai = new BattleshipAI();
+//				enemyGrid = ai.getGrid();
+				shipEnemyInfos.addAll(ai.getShipInfo());
+//				ai.setEnemyGrid(grid);
+				createUserVSUserScene(primaryStage, grid);
+			}
 		});
 
 
