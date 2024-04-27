@@ -106,7 +106,7 @@ public class Server{
 							if(message.getPlayingAI()){
 								System.out.println("PLAYING AI");
 								// add thread to the list
-								out.writeObject(new Message(message.getPlayer1(), "AIConnected"," ", null, true));
+//								out.writeObject(new Message(message.getPlayer1(), "AIConnected"," ", null, true));
 							} else {
 								pairPlayers(message);
 							}

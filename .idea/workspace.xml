@@ -4,8 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" name="Changes" comment="" />
-    <list id="e0d7bac4-21a1-496c-8df6-91c88625f3a2" name="Changes by victoriarossi" comment="" />
+    <list default="true" id="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Project3Client/src/main/java/CodeToSave.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project3Client/src/main/java/BattleshipAI.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project3Client/src/main/java/BattleshipAI.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project3Client/src/main/java/GuiClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project3Client/src/main/java/GuiClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project3Client/src/main/java/ShipInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project3Client/src/main/java/ShipInfo.java" afterDir="false" />
+    </list>
+    <list id="7e9edf7c-9b9e-436c-a7bb-a73d523a5238" name="Changes by victoriarossi" comment="">
+      <change beforePath="$PROJECT_DIR$/Project3Client/src/main/java/GuiClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project3Client/src/main/java/GuiClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project3Server/src/main/java/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project3Server/src/main/java/Server.java" afterDir="false" />
+    </list>
     <list id="db7ca0c4-a3d0-4ec7-a776-f808cde17f6b" name="Changes by xristianbg" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,6 +46,19 @@
     &quot;accountId&quot;: &quot;3237aa44-2960-498c-89fa-5b63ccfdf2b5&quot;
   }
 }</component>
+  <component name="LineStatusTrackerManager">
+    <file path="$PROJECT_DIR$/Project3Client/src/main/java/GuiClient.java">
+      <ranges>
+        <range start1="80" end1="80" start2="80" end2="83" changelist="7e9edf7c-9b9e-436c-a7bb-a73d523a5238" />
+        <range start1="111" end1="114" start2="114" end2="116" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
+        <range start1="202" end1="207" start2="204" end2="239" changelist="7e9edf7c-9b9e-436c-a7bb-a73d523a5238" />
+        <range start1="224" end1="224" start2="256" end2="257" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
+        <range start1="237" end1="237" start2="270" end2="277" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
+        <range start1="430" end1="431" start2="470" end2="479" changelist="7e9edf7c-9b9e-436c-a7bb-a73d523a5238" />
+        <range start1="654" end1="654" start2="702" end2="703" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
+      </ranges>
+    </file>
+  </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
@@ -62,7 +84,7 @@
     &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main-game&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/shaankohli/Documents/GitHub/cs342-finalproject/Project3Server/src/main/java&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Bulgy/Desktop/UIC School Work/Spring2024Semester4/CS342/cs342-finalproject&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -180,6 +202,7 @@
       <workItem from="1713919761683" duration="16458000" />
       <workItem from="1713974306986" duration="1849000" />
       <workItem from="1714007305113" duration="23449000" />
+      <workItem from="1714149440110" duration="15964000" />
     </task>
     <servers />
   </component>

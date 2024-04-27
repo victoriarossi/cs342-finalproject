@@ -20,6 +20,11 @@ class ShipInfo implements Serializable {
         this.hits = 0;
     }
 
+    public ShipInfo(int length){
+        this.length = length;
+        this.positions = new ArrayList<>();
+        this.hits = 0;
+    }
     // Method to add position to the ship
     public void addPosition(int x, int y) {
         positions.add(new Point(x, y));

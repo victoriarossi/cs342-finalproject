@@ -79,6 +79,10 @@ public class GuiClient extends Application{
 	Button NUKE;
 	Button deselect;
 
+	BattleshipAI ai;
+	GridPane gridPaneTest = new GridPane();
+	int aiShipSunk = 0;
+
 
 
 	// styling strings for different UI
@@ -109,9 +113,8 @@ public class GuiClient extends Application{
 				}
 				else {
 					if (playingAI) {
-						AI ai = new AI();
-						System.out.println("AIIIII");
-
+						ai = new BattleshipAI();
+						// TODO: my turn and ai's turn
 					} else {
 						if ("Paired".equals(msg.getMessageContent())) {
 							enemy = msg.getPlayer2();
@@ -200,11 +203,33 @@ public class GuiClient extends Application{
 		NUKE = new Button("Hit");
 		NUKE.setStyle(btnStyle);
 		NUKE.setOnAction( e -> {
-			if (hasSelectedCell) {
-				buttonsClickedCount = 0;
-				NUKE.setDisable(true);
-				clientConnection.send(new Message("Move", currUsername, enemy, xMove, yMove, false));
-				hasSelectedCell = false;
+			if(playingAI){
+				//TODO: play move on ai + add a waiting time
+				myTurn = true;
+
+				Platform.runLater(() -> {
+					String result = "Miss";
+					for(ShipInfo theEShip : shipEnemyInfos){
+						for(Point position : theEShip.getPositions()){
+							if(position.x == xMove && position.y == yMove){
+								result = "Hit";
+								break;
+							}
+						}
+					}
+					updateGridCell(xMove, yMove, result);
+					NUKE.setDisable(true);
+					aiMakeMove();
+				});
+
+
+			} else {
+				if (hasSelectedCell) {
+					buttonsClickedCount = 0;
+					NUKE.setDisable(true);
+					clientConnection.send(new Message("Move", currUsername, enemy, xMove, yMove, false));
+					hasSelectedCell = false;
+				}
 			}
 		});
 
@@ -223,6 +248,7 @@ public class GuiClient extends Application{
 		sceneMap.put("waitingScene", createWaitingScene(primaryStage));
 		sceneMap.put("victoryScene", createVictoryScene(primaryStage));
 
+
 		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent t) {
@@ -236,12 +262,32 @@ public class GuiClient extends Application{
 		primaryStage.show();
 	}
 
+	private void aiMakeMove(){
+		Point aiHit = ai.makeAMove();
+		System.out.println("I AM AI");
+		myTurn = false;
+		String result = "Miss";
+		for(ShipInfo myShip : shipInfos){
+			for(Point position : myShip.getPositions()){
+                if (position.x == aiHit.x && position.y == aiHit.y) {
+                    result = "Hit";
+                    break;
+                }
+
+			}
+		}
+		updateGridCell(xMove, yMove, result);
+		NUKE.setDisable(false);
+		buttonsClickedCount--;
+    }
+
+
 	private void updateGridCell(int x, int y, String result) {
 		Platform.runLater(() -> {
 			// Determine if the update is for the user's grid or enemy's grid
 			if (result.equals("Hit") || result.equals("Miss")) {
 				char status = result.equals("Hit") ? 'H' : 'M';
-
+				System.out.println("Updating Cell!!!" + status);
 				//TODO: if is not my turn then set a new shipinfo for enemy
 
 				// Update the user's grid if the opponent hits
@@ -261,14 +307,14 @@ public class GuiClient extends Application{
 				// Update the button on the user's grid UI to reflect the hit or miss
 
 				ShipInfo ship = findShipAt(x, y);
-				System.out.println("STATUS: " + status);
-				System.out.println("SHIP: " + ship);
+//				System.out.println("STATUS: " + status);
+//				System.out.println("SHIP: " + ship);
 				if (ship != null && status == 'H') {
-					System.out.println("HITS: " + ship.hits);
+//					System.out.println("HITS: " + ship.hits);
 					ship.recordHit();
-					System.out.println("HITS: " + ship.hits);
+//					System.out.println("HITS: " + ship.hits);
 					if (ship.isSunk()) {
-						System.out.println("RECORDED AND SUNK");
+//						System.out.println("RECORDED AND SUNK");
 						highlightSunkShip(ship, myTurn);
 					}
 				}
@@ -278,11 +324,11 @@ public class GuiClient extends Application{
 
 	private ShipInfo findShipAt(int x, int y) {
 		for (ShipInfo ship : shipEnemyInfos) {  // Assuming shipInfos holds all ships
-			System.out.println(ship.length + " positions: " + ship.positions);
+//			System.out.println(ship.length + " positions: " + ship.positions);
 			for (Point pos : ship.getPositions()) {
 				if (pos.x == x && pos.y == y) {
-					System.out.println("FOUND SHIP");
-					System.out.println("POS: " + pos.x + ", " + pos.y);
+//					System.out.println("FOUND SHIP");
+//					System.out.println("POS: " + pos.x + ", " + pos.y);
 					return ship;
 				}
 			}
@@ -428,7 +474,15 @@ public class GuiClient extends Application{
 			gameStarted = true;
 			System.out.println("Start clicked");
 			System.out.println("Sending current username: " + currUsername);
-			clientConnection.send(new Message(currUsername, "Pair", grid, shipInfos, playingAI));
+			if(!playingAI) {
+				clientConnection.send(new Message(currUsername, "Pair", grid, shipInfos, playingAI));
+			} else {
+				ai = new BattleshipAI();
+//				enemyGrid = ai.getGrid();
+				shipEnemyInfos.addAll(ai.getShipInfo());
+//				ai.setEnemyGrid(grid);
+				createUserVSUserScene(primaryStage, grid);
+			}
 		});
 
 		if(placedShipsCounter != 5){
@@ -652,6 +706,7 @@ public class GuiClient extends Application{
 					System.out.println("Counter Enemy: " + buttonsClickedCount);
 					if (buttonsClickedCount < 1) {
 						handleGridClick(finalI, finalJ);
+						System.out.println("x: " + finalI + "y: " + finalJ);
 						button.setDisable(true);
 						buttonsClickedCount++;
 						hasSelectedCell = true;
