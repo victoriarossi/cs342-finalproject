@@ -3,6 +3,7 @@ import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Stack;
 
+import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -24,6 +25,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.util.Duration;
 
 
 public class GuiClient extends Application{
@@ -88,6 +90,7 @@ public class GuiClient extends Application{
 
 	boolean whoWon = false;
 
+	PauseTransition pause = new PauseTransition(Duration.millis(360));
 
 	Button NUKE;
 
@@ -129,8 +132,6 @@ public class GuiClient extends Application{
 					if (playingAI) {
 
 						ai = new BattleshipAI();
-
-						// TODO: my turn and ai's turn
 
 					} else {
 						if ("Paired".equals(msg.getMessageContent())) {
@@ -223,21 +224,26 @@ public class GuiClient extends Application{
 		NUKE.setOnAction( e -> {
 			if(playingAI){
 				//TODO: play move on ai + add a waiting time
-				myTurn = true;
+				myTurn = false;
 				Platform.runLater(() -> {
 					String result = "Miss";
 					for(ShipInfo theEShip : shipEnemyInfos){
 						for(Point position : theEShip.getPositions()){
 							if(position.x == xMove && position.y == yMove){
 								result = "Hit";
+//								System.out.println("IT WAS A HIT");
 								break;
 							}
 						}
 					}
 
+					System.out.println("IT WAS A " + result);
 					updateGridCell(xMove, yMove, result);
 					NUKE.setDisable(true);
-					aiMakeMove();
+					//add waiting response
+					pause.play();
+					pause.setOnFinished(ev -> aiMakeMove());
+
 				});
 			} else {
 				if (hasSelectedCell) {
@@ -279,10 +285,13 @@ public class GuiClient extends Application{
 	private void aiMakeMove(){
 
 		Point aiHit = ai.makeAMove();
+		System.out.println("TRYING TO HIT: " + aiHit.x + " " + aiHit.y);
+		xMove = aiHit.x;
+		yMove = aiHit.y;
 
 		System.out.println("I AM AI");
 
-		myTurn = false;
+		myTurn = true;
 
 		String result = "Miss";
 
@@ -299,6 +308,7 @@ public class GuiClient extends Application{
 				}
 			}
 		}
+		System.out.println("IT WAS A" + result);
 		updateGridCell(xMove, yMove, result);
 		NUKE.setDisable(false);
 		buttonsClickedCount--;
@@ -306,11 +316,13 @@ public class GuiClient extends Application{
 	}
 
 	private void updateGridCell(int x, int y, String result) {
-		Platform.runLater(() -> {
+//		Platform.runLater(() -> {
+			System.out.println("RESULT on updateGridCell: " + result);
 
 			// Determine if the update is for the user's grid or enemy's grid
 			if (result.equals("Hit") || result.equals("Miss")) {
 				char status = result.equals("Hit") ? 'H' : 'M';
+				System.out.println("STATUS: " + status);
 
 				// Update the user's grid if the opponent hits
 				if (myTurn) {
@@ -345,10 +357,11 @@ public class GuiClient extends Application{
 					}
 				}
 			}
-		});
+//		});
 	}
 
 	private ShipInfo findShipAt(int x, int y) {
+		System.out.println("Looking for: " + x + ", " + y);
 		for (ShipInfo ship : shipEnemyInfos) {  // Assuming shipInfos holds all ships
 			System.out.println(ship.length + " positions: " + ship.positions);
 			for (Point pos : ship.getPositions()) {

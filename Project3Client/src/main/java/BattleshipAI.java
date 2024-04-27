@@ -69,7 +69,7 @@ public class BattleshipAI {
                     for (int i = 0; i < size; i++) {
                         int posX = horizontal ? x : x + i;
                         int posY = horizontal ? y + i : y;
-                        ship.addPosition(posX, posY); // Place horizontally or vertically
+                        ship.addPosition(posY, posX); // Place horizontally or vertically
                         grid[posX][posY] = true; // Mark this grid position as occupied
                     }
                     shipInfos.add(ship);
@@ -123,6 +123,7 @@ public class BattleshipAI {
             y = random.nextInt(gridSize);
             System.out.println("Here");
         }
+        System.out.println("AI MAKE MOVE CLASS");
         enemyGrid.get(x).set(y, true);
         //if there is a ship there put 'H'. Otherwise, 'M'
 //        enemyGrid.get(x).set(y, 'H');
