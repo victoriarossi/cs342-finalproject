@@ -4,15 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" name="Changes" comment="" />
     <list id="39e23b1b-9ec1-49b7-9db6-932185b08be2" name="Changes by Bulgy" comment="" />
-    <list id="3c6fb92b-5a23-4eca-9dec-3aa8aaadbb66" name="Changes by victoriarossi" comment="">
-      <change beforePath="$PROJECT_DIR$/Project3Client/src/main/java/BattleshipAI.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project3Client/src/main/java/BattleshipAI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project3Client/src/main/java/GuiClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project3Client/src/main/java/GuiClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project3Client/src/main/java/ShipInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project3Client/src/main/java/ShipInfo.java" afterDir="false" />
-    </list>
+    <list id="3c6fb92b-5a23-4eca-9dec-3aa8aaadbb66" name="Changes by victoriarossi" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />

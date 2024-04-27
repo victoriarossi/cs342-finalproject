@@ -521,7 +521,7 @@ public class GuiClient extends Application{
 		for (int i = 0; i < shipLengths.length; i++) {
 			int length = shipLengths[i];
 			Button shipButton = new Button(String.valueOf(length));
-			shipButton.setStyle("-fx-background-color: #7B3F00; -fx-text-fill: white");
+			shipButton.setStyle("-fx-background-color: #7B3F00; -fx-text-fill: white; -fx-cursor: hand");
 			shipButton.setPrefSize(length * 30, 20);
 			shipButton.setLayoutX(xOffset);
 			shipButton.setLayoutY(20);
@@ -996,6 +996,7 @@ public class GuiClient extends Application{
 		Button homeButton = new Button("Home");
 		homeButton.setOnAction(e -> {
 			// Action to go Home
+			resetGrid();
 			primaryStage.setScene(sceneMap.get("options"));
 		});
 
@@ -1024,8 +1025,10 @@ public class GuiClient extends Application{
 
 		// Creating the Home Button
 		Button homeButton = new Button("Home");
+		homeButton.setStyle(btnStyle);
 		homeButton.setOnAction(e -> {
 			// Action to go Home
+			resetGrid();
 			primaryStage.setScene(sceneMap.get("options"));
 		});
 
