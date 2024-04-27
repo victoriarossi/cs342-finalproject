@@ -1,6 +1,8 @@
 import java.awt.*;
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.Stack;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -45,6 +47,8 @@ public class GuiClient extends Application{
 	private String messageContent;
 	ListView<String> listItems2;
 
+	Stack<ShipInfo> stackOfShipsPlaced = new Stack<>();
+
 	private boolean hasSelectedCell = false;
 	ListView<String> displayListUsers;
 
@@ -68,10 +72,12 @@ public class GuiClient extends Application{
 	private boolean isHorizontal = true;
 	private boolean directionClicked = false;
 
+	private ShipInfo lastPlacedShip = null;
+
 	GridPane gridPaneEnemy = new GridPane();
 	Button horizontalBtn;
 	Button verticalBtn;
-	Button start;
+	Button start = new Button("Start");
 
 	int buttonsClickedCount = 0;
 	private int placedShipsCounter = 0;
@@ -80,9 +86,13 @@ public class GuiClient extends Application{
 
 	int gameOverCheck = 0;
 
+	boolean whoWon = false;
+
 	Button hit;
 
 	Button NUKE;
+
+	Button undoShipBtn;
 
 	// styling strings for different UI
 	String btnStyle = "-fx-background-color: #259EE8; -fx-text-fill: black; -fx-background-radius: 25px; -fx-padding: 14; -fx-cursor: hand; -fx-font-size: 18";
@@ -135,21 +145,28 @@ public class GuiClient extends Application{
 						System.out.println("RETURNED AI");
 						createUserVSUserScene(primaryStage, grid);
 					}
-
-					if("Hit".equals(msg.getMessageContent())){
+					if ("Win".equals(msg.getMessageContent())) {
+						System.out.println("I am the winner");
+//						if (msg.getPlayer1() == currUsername) {
+//							whoWon = true;
+//						}
+//						updateGridCell(msg.getX(), msg.getY(), msg.getMessageContent(), primaryStage);
+						primaryStage.setScene(sceneMap.get("victoryScene"));
+					}
+					else if ("Lose".equals(msg.getMessageContent())) {
+						primaryStage.setScene(sceneMap.get("losingScene"));
+					}
+					else if("Hit".equals(msg.getMessageContent())){
 						//update enemy's grid
 						enemyGrid.get(msg.getX()).set(msg.getY(), 'H');
 						myTurn = msg.getMyTurn();
 						if(myTurn){
-//							enableButtons();
 							NUKE.setDisable(false);
 						} else {
-//							disableButtons();
 							shipEnemyInfos.addAll(msg.getShipInfo());
 							NUKE.setDisable(true);
 						}
 						updateGridCell(msg.getX(), msg.getY(), msg.getMessageContent(), primaryStage);
-
 
 					} else if("Miss".equals(msg.getMessageContent())){
 						//update enemy's grid
@@ -165,7 +182,6 @@ public class GuiClient extends Application{
 						}
 						updateGridCell(msg.getX(), msg.getY(), msg.getMessageContent(), primaryStage);
 					}
-
 				}
 			});
 		});
@@ -200,8 +216,6 @@ public class GuiClient extends Application{
 			}
 		});
 
-
-
 		// scene map for different scenes
 		sceneMap = new HashMap<String, Scene>();
 		sceneMap.put("startScene", createIntroScene(primaryStage));
@@ -210,7 +224,6 @@ public class GuiClient extends Application{
 		sceneMap.put("clientLogin", createLoginScene(primaryStage)); // adds login screen to scene map
 		sceneMap.put("options", createOptionsScene(primaryStage)); // adds the options screen to scene map
 		sceneMap.put("setUpShipScene", createSetUpShipScene(primaryStage));
-		sceneMap.put("users", createViewUsersScene(primaryStage)); // adds the view users screen to scene map
 //		sceneMap.put("userVSUser", createuserVSUserScene(primaryStage)); // add the main game screen to scene map
 		sceneMap.put("waitingScene", createWaitingScene(primaryStage));
 		sceneMap.put("victoryScene", createVictoryScene(primaryStage));
@@ -231,11 +244,10 @@ public class GuiClient extends Application{
 
 	private void updateGridCell(int x, int y, String result, Stage primaryStage) {
 		Platform.runLater(() -> {
+
 			// Determine if the update is for the user's grid or enemy's grid
 			if (result.equals("Hit") || result.equals("Miss")) {
 				char status = result.equals("Hit") ? 'H' : 'M';
-
-				//TODO: if is not my turn then set a new shipinfo for enemy
 
 				// Update the user's grid if the opponent hits
 				if (myTurn) {
@@ -256,18 +268,16 @@ public class GuiClient extends Application{
 				// Update the button on the user's grid UI to reflect the hit or miss
 
 				ShipInfo ship = findShipAt(x, y);
-				System.out.println("STATUS: " + status);
-				System.out.println("SHIP: " + ship);
 				if (ship != null && status == 'H') {
-					System.out.println("HITS: " + ship.hits);
+
 					ship.recordHit();
-					System.out.println("HITS: " + ship.hits);
+
 					if (ship.isSunk()) {
 						System.out.println("RECORDED AND SUNK");
 						highlightSunkShip(ship, myTurn);
 						gameOverCheck++;
 						if (gameOverCheck == 5) {
-							primaryStage.setScene(sceneMap.get("victoryScene"));
+							clientConnection.send(new Message(currUsername, "Ship Sunk", enemy));
 						}
 					}
 				}
@@ -296,7 +306,6 @@ public class GuiClient extends Application{
 			btn.setStyle("-fx-background-color: darkred;");
 		}
 	}
-
 
 	public Button getBackBtn(String scene, Stage primaryStage){
 		// Create back button
@@ -389,7 +398,6 @@ public class GuiClient extends Application{
 	}
 
 	public Scene createSetUpShipScene(Stage primaryStage) {
-		
 		GridPane gridPane = new GridPane();
 		gridPane.setAlignment(Pos.TOP_CENTER);
 		gridPane.setHgap(0);
@@ -414,13 +422,17 @@ public class GuiClient extends Application{
 			}
 		}
 
+		if(placedShipsCounter != 5){
+			start.setDisable(true);
+		}
+
 //		BorderPane pane = new BorderPane();
 		Button backBtn = getBackBtn("options", primaryStage);
 //		VBox root = new VBox(10);
 		Pane shipContainer = new Pane(); // container to hold all ships
 		shipContainer.setPrefSize(200, 60);
 
-		start = new Button("Start");
+
 		start.setStyle(btnStyle);
 		start.setOnAction(e -> {
 			gameStarted = true;
@@ -429,9 +441,6 @@ public class GuiClient extends Application{
 			clientConnection.send(new Message(currUsername, "Pair", grid, shipInfos, playingAI));
 		});
 
-		if(placedShipsCounter != 5){
-			start.setDisable(true);
-		}
 
 		horizontalBtn = new Button("Place Horizontally");
 		horizontalBtn.setStyle("-fx-background-color: #259EE8; -fx-text-fill: black; -fx-background-radius: 25px; -fx-padding: 14; -fx-cursor: hand; -fx-font-size: 18");
@@ -476,10 +485,38 @@ public class GuiClient extends Application{
 			verticalBtn.setDisable(true);
 		}
 
+
+		undoShipBtn = new Button("Undo Ship");
+		undoShipBtn.setStyle(btnStyle);
+		undoShipBtn.setDisable(true);
+		undoShipBtn.setOnAction(e -> {
+			if (!stackOfShipsPlaced.isEmpty()) {
+				ShipInfo shipToUndo = stackOfShipsPlaced.pop();
+				removeShipFromGrid(shipToUndo);
+				shipToUndo.isPlaced = false;
+				shipToUndo.shipButton.setDisable(false);
+
+				if (stackOfShipsPlaced.isEmpty()) {
+					undoShipBtn.setDisable(true);
+					lastPlacedShip = null;
+				} else {
+					lastPlacedShip = stackOfShipsPlaced.peek();
+				}
+
+				placedShipsCounter--;
+
+				if(placedShipsCounter != 5){
+					start.setDisable(true);
+				}
+			}
+		});
+
+
+
 		horizontalBtn.setAlignment(Pos.CENTER);
 		verticalBtn.setAlignment(Pos.CENTER);
 		start.setAlignment(Pos.CENTER_RIGHT);
-		HBox placementButtons = new HBox(10, horizontalBtn, verticalBtn, start);
+		HBox placementButtons = new HBox(10, undoShipBtn, horizontalBtn, verticalBtn, start);
 		placementButtons.alignmentProperty().set(Pos.CENTER);
 
 		Label title = new Label("Prepare Your Ships");
@@ -521,6 +558,20 @@ public class GuiClient extends Application{
 				}
 			}
 		}
+	}
+
+	private void removeShipFromGrid(ShipInfo ship) {
+		System.out.println("Removing ship with positions: " + ship.getPositions());
+		for (Point pos : ship.getPositions()) {
+			int x = pos.y;
+			int y = pos.x;
+			System.out.println("Clearing position: " + x + ", " + y);
+			buttons[x][y].setText("");  // Clear the text marking it as part of a ship
+			occupied[x][y] = false;  // Mark the cell as unoccupied
+			buttons[x][y].setStyle("-fx-background-color: #77BAFC;"); // Reset to default color
+			grid.get(y).set(x, 'W'); // Set back to water
+		}
+		ship.getPositions().clear(); // Clear the positions in ship info
 	}
 
 
@@ -567,24 +618,29 @@ public class GuiClient extends Application{
 			}
 		}
 
-//		ship.isPlaced = true;
+		stackOfShipsPlaced.push(ship);
+		lastPlacedShip = ship;
+		undoShipBtn.setDisable(false);
+		ship.isPlaced = true;
 	}
 
 	private void resetGrid() {
+
 		for (int i = 0; i < size; i++) {
 			for (int j = 0; j < size; j++) {
 				buttons[i][j].setText("");  // Clear any text
-				buttons[i][j].setStyle("");  // Reset styles, if any
+				buttons[i][j].setStyle("-fx-background-color: #77BAFC;");
 				occupied[i][j] = false;  // Reset the occupancy state
 			}
 		}
-
 		for (ShipInfo shipInfo : shipInfos) {
 			shipInfo.shipButton.setDisable(false);
-			shipInfo.shipButton.setStyle("");
+			shipInfo.shipButton.setStyle("-fx-background-color: #7B3F00; -fx-text-fill: white");
 			shipInfo.isPlaced = false;
 		}
 		gameStarted = false;  // Reset game start flag
+		undoShipBtn.setDisable(true);
+		start.setDisable(true);
 	}
 
 	private boolean isPartOfSunkShip(int x, int y){
@@ -740,43 +796,6 @@ public class GuiClient extends Application{
 		return new Scene(root, 800, 600);
 	}
 
-	public Scene createViewUsersScene(Stage primaryStage){
-		BorderPane pane = new BorderPane();
-
-		// Create back button
-		Image home = new Image("back_arrow.png");
-		ImageView homeView = new ImageView(home);
-		homeView.setFitHeight(15);
-		homeView.setFitWidth(15);
-		Button backBtn = new Button();
-
-		// changes scene back to options screen on click
-		backBtn.setOnAction( e -> {
-			primaryStage.setScene(sceneMap.get("options"));
-		});
-		backBtn.setGraphic(homeView);
-		backBtn.setStyle(btnStyle.concat("-fx-font-size: 14; -fx-padding: 10; -fx-background-radius: 25px; -fx-cursor: hand"));
-
-		BorderPane.setAlignment(backBtn, Pos.TOP_LEFT);
-		pane.setTop(backBtn);
-
-		Color backgroundColor = Color.web("#C7FBFF");
-		pane.setBackground(new Background(new BackgroundFill(backgroundColor, CornerRadii.EMPTY, Insets.EMPTY)));
-
-		Label title = new Label("List of all users:");
-		title.setStyle(titleStyle);
-
-		// stores the title and user list in here
-		VBox users = new VBox(20, title, displayListUsers);
-		users.setStyle("-fx-background-color: #F4DAB3; -fx-font-family: 'serif'");
-		VBox.setMargin(users, new Insets(30));
-		users.setAlignment(Pos.CENTER);
-		displayListUsers.setMaxWidth(400);
-		displayListUsers.setMaxHeight(250);
-
-		pane.setCenter(users);
-		return new Scene(pane, 800, 600);
-	}
 
 	public Scene createRulesScene(Stage primaryStage) {
 
@@ -843,6 +862,7 @@ public class GuiClient extends Application{
 
 		// Start Button and styling
 		Button startBtn = new Button("Start Game");
+
 //		startBtn.setFont(javafx.scene.text.Font.font("Arial", 20));
 		startBtn.setPrefSize(200, 50);
 		startBtn.setStyle(btnStyle);
@@ -887,16 +907,27 @@ public class GuiClient extends Application{
 
 
 	private Scene createVictoryScene(Stage primaryStage) {
-		// Creating the Text for Victory Message
 		Text victoryText = new Text("Congratulations! You Win!");
+//		String theWin;
+//		if (whoWon) {
+//			// Creating the Text for Victory Message
+//			victoryText = new Text("Congratulations! You Win!");
+//			theWin = "winImage.jpg";
+//		}
+//		else {
+//			// Creating the Text for Victory Message
+//			victoryText = new Text("LOSER! You LOST!");
+//			theWin = "loseImage.jpg";
+//		}
 		victoryText.setFont(Font.font("Arial", FontWeight.BOLD, 24));
 		victoryText.setFill(Color.YELLOW);
+
 
 		// Creating the Home Button
 		Button homeButton = new Button("Home");
 		homeButton.setOnAction(e -> {
 			// Action to go Home
-			System.out.println("Going home..."); // Replace with actual action to switch Scene
+			primaryStage.setScene(sceneMap.get("options"));
 		});
 
 		// Layout
@@ -905,9 +936,10 @@ public class GuiClient extends Application{
 		layout.getChildren().addAll(victoryText, homeButton);
 
 		// Set Background Image to fit the screen
-		BackgroundImage myBI = new BackgroundImage(new Image("loseImage.jpg"),
+		BackgroundImage myBI = new BackgroundImage(new Image("winImage.jpg"),
 				BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER,
 				new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, true, true, true, true));
+
 		layout.setBackground(new Background(myBI));
 
 		// Creating the Scene
@@ -925,7 +957,7 @@ public class GuiClient extends Application{
 		Button homeButton = new Button("Home");
 		homeButton.setOnAction(e -> {
 			// Action to go Home
-			System.out.println("Going home..."); // Replace with actual action to switch Scene
+			primaryStage.setScene(sceneMap.get("options"));
 		});
 
 		// Layout

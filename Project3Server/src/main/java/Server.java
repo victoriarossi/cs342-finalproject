@@ -18,14 +18,13 @@ public class Server{
 	ArrayList<AIThread> ais = new ArrayList<>();
 	static ArrayList<String> clientID = new ArrayList<>();
 	TheServer server;
-//	ArrayList<ArrayList<>>
+
 	private Consumer<Serializable> callback;
 	private Stack<UserInfo> userStack = new Stack<>();
 	private ArrayList<UserInfo> userInfos = new ArrayList<>();
 	int count = 0;
 
 	Server(Consumer<Serializable> call){
-	
 		callback = call;
 		server = new TheServer();
 		server.start();
@@ -227,11 +226,17 @@ public class Server{
 							}
 						} else if("Move".equals(message.getMessageContent())){
 							// a player is playing a move
-							if(message.getPlayingAI()){
-								//playAIMove(message);
-							} else {
-								playMove(message);
-							}
+//							if(message.getPlayingAI()){
+//								//playAIMove(message);
+//							} else {
+//								playMove(message);
+//							}
+							playMove(message);
+						}
+						else if ("Ship Sunk".equals(message.getMessageContent())) {
+//							playMove(message);
+							updateClients(new Message(message.getPlayer1(), "Win", message.getPlayer2()));
+							updateClients(new Message(message.getPlayer2(), "Lose", message.getPlayer1()));
 						}
 					}
 				}
@@ -324,18 +329,29 @@ public class Server{
 					//get enemy's grid
 					ArrayList<ArrayList<Character>> grid = new ArrayList<>();
 					ArrayList<ShipInfo> shipInfoList = new ArrayList<>();
+					boolean allShipsSunk = false;
+
 					for(UserInfo userInfo : userInfos) {
 						if(userInfo.getUsername().equals(message.getPlayer2())){
 							grid = userInfo.getGrid();
 							shipInfoList.addAll(userInfo.getShipInfoList());
+							allShipsSunk = userInfo.areAllShipsSunk();
 						}
 					}
 
-//					System.out.println("Updating enemy's grid: " + grid);
+
+					System.out.println("Updating enemy's grid: " + grid);
 					if(grid.get(message.getX()).get(message.getY()) == 'B'){
+						System.out.println("Set grid cell to B");
 						grid.get(message.getX()).set(message.getY(), 'H');
+						System.out.println("Checking if All Ships are Sunk");
 						updateClients(new Message("Hit", message.getPlayer1(),message.getPlayer2(), message.getX(), message.getY(), false, shipInfoList));
-						updateClients(new Message("Hit",message.getPlayer2(), message.getPlayer1(), message.getX(), message.getY(), true));
+						updateClients(new Message("Hit", message.getPlayer2(),message.getPlayer1(), message.getX(), message.getY(), true));
+						if (allShipsSunk) {
+							updateClients(new Message("Win", message.getPlayer1(), message.getPlayer2(), message.getX(), message.getY(), false, shipInfoList));
+							updateClients(new Message("Win", message.getPlayer2(),message.getPlayer1(), message.getX(), message.getY(), true));
+						}
+
 					} else if(grid.get(message.getX()).get(message.getY()) == 'W'){
 						grid.get(message.getX()).set(message.getY(), 'M');
 						updateClients(new Message("Miss", message.getPlayer1(),message.getPlayer2(), message.getX(), message.getY(), false, shipInfoList));
@@ -345,6 +361,7 @@ public class Server{
 				}
 			}
 		}
+
 	}//end of client thread
 }
 

@@ -24,5 +24,12 @@ public class UserInfo {
 		return shipInfoList;
 	}
 
-
+	public boolean areAllShipsSunk() {
+		for (ShipInfo ship : shipInfoList) {
+			if (!ship.isSunk()) {
+				return false;
+			}
+		}
+		return true;
+	}
 }
