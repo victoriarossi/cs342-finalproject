@@ -81,7 +81,7 @@ public class GuiClient extends Application{
 	Button verticalBtn;
 	Button start = new Button("Start");
 
-	int buttonsClickedCount = 0;
+//	int buttonsClickedCount = 0;
 	private int placedShipsCounter = 0;
 	String enemy;
 	Boolean myTurn = false;
@@ -240,11 +240,10 @@ public class GuiClient extends Application{
 					//add waiting response
 					pause.play();
 					pause.setOnFinished(ev -> aiMakeMove(primaryStage));
-
 				});
 			} else {
 				if (hasSelectedCell) {
-					buttonsClickedCount = 0;
+//					buttonsClickedCount = 0;
 					NUKE.setDisable(true);
 					clientConnection.send(new Message("Move", currUsername, enemy, xMove, yMove, false));
 					hasSelectedCell = false;
@@ -305,7 +304,7 @@ public class GuiClient extends Application{
 
 		updateGridCell(xMove, yMove, result, primaryStage);
 		NUKE.setDisable(false);
-		buttonsClickedCount--;
+//		buttonsClickedCount--;
 
 	}
 
@@ -349,38 +348,38 @@ public class GuiClient extends Application{
 				if (ship.isSunk()) {
 //						System.out.println("RECORDED AND SUNK");
 					highlightSunkShip(ship, myTurn);
-					if (myTurn) {
-						System.out.println("GameOverCheck Before Increment: " + gameOverCheck);
-						gameOverCheck++;
-						System.out.println("GameOverCheck After Increment: " + gameOverCheck);
-						if (gameOverCheck == 5) {
-							clientConnection.send(new Message(enemy, "Win", currUsername));
+					if (!playingAI) {
+						if (myTurn) {
+							System.out.println("GameOverCheck Before Increment: " + gameOverCheck);
+							gameOverCheck++;
+							System.out.println("GameOverCheck After Increment: " + gameOverCheck);
+							if (gameOverCheck == 5) {
+								clientConnection.send(new Message(enemy, "Win", currUsername));
+							}
+						} else {
+							System.out.println("GameOverCheck2 Before Increment: " + gameOverCheck);
+							gameOverCheck2++;
+							System.out.println("GameOverCheck2 After Increment: " + gameOverCheck);
+							if (gameOverCheck2 == 5) {
+								clientConnection.send(new Message(currUsername, "Win", enemy));
+							}
 						}
 					} else {
-						System.out.println("GameOverCheck2 Before Increment: " + gameOverCheck);
-						gameOverCheck2++;
-						System.out.println("GameOverCheck2 After Increment: " + gameOverCheck);
-						if (gameOverCheck2 == 5) {
-							clientConnection.send(new Message(currUsername, "Win", enemy));
-
-//						gameOverCheck++;
-//						if (gameOverCheck == 5) {
-//							if(playingAI){
-//								if(!myTurn){ // NOT SURE ABOUT THIS, NEED TO ACTUALLY USE MY BRAIN
-//									primaryStage.setScene(sceneMap.get("victoryScene"));
-//								} else {
-//									primaryStage.setScene(sceneMap.get("losingScene"));
-//								}
-//
-//							} else {
-//								clientConnection.send(new Message(currUsername, "Ship Sunk", enemy));
-//
-//							}
+						if(!myTurn){
+							gameOverCheck++;
+							System.out.printf("gameOverCheck on AI: " + gameOverCheck);
+							if(gameOverCheck == 5) {
+								primaryStage.setScene(sceneMap.get("victoryScene"));
+							}
+						} else {
+							gameOverCheck2++;
+							if(gameOverCheck2 == 5) {
+								primaryStage.setScene(sceneMap.get("losingScene"));
+							}
 						}
 					}
 				}
 			}
-//		});
 		}
 	}
 
@@ -828,7 +827,7 @@ public class GuiClient extends Application{
 
 					handleGridClick(finalI, finalJ, button);
 					button.setDisable(true);
-					buttonsClickedCount++;
+//					buttonsClickedCount++;
 					hasSelectedCell = true;
 				});
 				buttons2[x][y] = button;
@@ -857,7 +856,7 @@ public class GuiClient extends Application{
 				button.setOnAction(e -> {
 					handleGridClick(finalI, finalJ, button);
 					button.setDisable(true);
-					buttonsClickedCount++;
+//					buttonsClickedCount++;
 					hasSelectedCell = true;
 				});
 				buttons2Enemy[x][y] = button;
