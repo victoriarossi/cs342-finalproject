@@ -106,7 +106,6 @@ public class GuiClient extends Application{
 	// styling strings for different UI
 	String btnStyle = "-fx-background-color: #259EE8; -fx-text-fill: black; -fx-background-radius: 25px; -fx-padding: 14; -fx-cursor: hand; -fx-font-size: 18";
 	String titleStyle = "-fx-font-size: 26; -fx-font-weight: bold; -fx-font-family: 'serif'; -fx-text-fill: #000000";
-	String subtitleStyle = "-fx-font-size: 18; -fx-font-weight: bold";
 	
 	public static void main(String[] args) {
 		launch(args);
@@ -121,7 +120,6 @@ public class GuiClient extends Application{
 				// checks if message indicates a valid username
 				if ("Ok Username".equals(msg.getMessageContent())) {
 					// updates the user list and goes to options screen
-//					updateUserList(msg);
 					primaryStage.setScene(sceneMap.get("options"));
 				}
 
@@ -139,30 +137,20 @@ public class GuiClient extends Application{
 							enemy = msg.getPlayer2();
 							myTurn = msg.getMyTurn();
 							if (myTurn) {
-//							enableButtons();
 								NUKE.setDisable(false);
 							} else {
-//							disableButtons();
 								NUKE.setDisable(true);
 							}
 
 							createUserVSUserScene(primaryStage, grid);
 						}
 						if ("Waiting".equals(msg.getMessageContent()) && msg.getPlayer1().equals(currUsername)) {
-//							System.out.println(grid);
 							primaryStage.setScene(sceneMap.get("waitingScene"));
 						}
 
 						if ("Win".equals(msg.getMessageContent())) {
-							System.out.println("I am the winner");
 							primaryStage.setScene(sceneMap.get("victoryScene"));
-//							if(msg.getPlayer1().equals(currUsername)){
-//								primaryStage.setScene(sceneMap.get("losingScene"));
-//							} else {
-//
-//							}
 						} else if ("Lose".equals(msg.getMessageContent())) {
-							System.out.println("I am the loser");
 							primaryStage.setScene(sceneMap.get("losingScene"));
 						}
 						else if ("Hit".equals(msg.getMessageContent())) {
@@ -182,10 +170,8 @@ public class GuiClient extends Application{
 							enemyGrid.get(msg.getX()).set(msg.getY(), 'M');
 							myTurn = msg.getMyTurn();
 							if (myTurn) {
-//							enableButtons();
 								NUKE.setDisable(false);
 							} else {
-//							disableButtons();
 								shipEnemyInfos.addAll(msg.getShipInfo());
 								NUKE.setDisable(true);
 							}
@@ -219,7 +205,6 @@ public class GuiClient extends Application{
 		NUKE.setStyle(btnStyle);
 		NUKE.setOnAction( e -> {
 			if(playingAI){
-				//TODO: play move on ai + add a waiting time
 				myTurn = false;
 				Platform.runLater(() -> {
 					String result = "Miss";
@@ -227,14 +212,11 @@ public class GuiClient extends Application{
 						for(Point position : theEShip.getPositions()){
 							if(position.x == xMove && position.y == yMove){
 								result = "Hit";
-//								System.out.println("IT WAS A HIT");
-//								theEShip.recordHit();
 								break;
 							}
 						}
 					}
 
-					System.out.println("IT WAS A " + result);
 					updateGridCell(xMove, yMove, result, primaryStage);
 					NUKE.setDisable(true);
 					//add waiting response
@@ -243,7 +225,6 @@ public class GuiClient extends Application{
 				});
 			} else {
 				if (hasSelectedCell) {
-//					buttonsClickedCount = 0;
 					NUKE.setDisable(true);
 					clientConnection.send(new Message("Move", currUsername, enemy, xMove, yMove, false));
 					hasSelectedCell = false;
@@ -255,11 +236,9 @@ public class GuiClient extends Application{
 		sceneMap = new HashMap<String, Scene>();
 		sceneMap.put("startScene", createIntroScene(primaryStage));
 		sceneMap.put("rules", createRulesScene(primaryStage));
-//		sceneMap.put("client",  createClientGui(primaryStage));
 		sceneMap.put("clientLogin", createLoginScene(primaryStage)); // adds login screen to scene map
 		sceneMap.put("options", createOptionsScene(primaryStage)); // adds the options screen to scene map
 		sceneMap.put("setUpShipScene", createSetUpShipScene(primaryStage));
-//		sceneMap.put("userVSUser", createuserVSUserScene(primaryStage)); // add the main game screen to scene map
 		sceneMap.put("waitingScene", createWaitingScene(primaryStage));
 		sceneMap.put("victoryScene", createVictoryScene(primaryStage));
 		sceneMap.put("losingScene", createLosingScene(primaryStage));
@@ -281,11 +260,8 @@ public class GuiClient extends Application{
 	private void aiMakeMove(Stage primaryStage){
 
 		Point aiHit = ai.makeAMove();
-		System.out.println("TRYING TO HIT: " + aiHit.x + " " + aiHit.y);
 		xMove = aiHit.x;
 		yMove = aiHit.y;
-
-		System.out.println("I AM AI");
 
 		myTurn = true;
 
@@ -294,28 +270,20 @@ public class GuiClient extends Application{
 			for (Point position : myShip.getPositions()) {
 				if (position.x == aiHit.x && position.y == aiHit.y) {
 					result = "Hit";
-//					myShip.recordHit();
 					break;
 				}
 			}
 		}
-		System.out.println("IT WAS A" + result);
-		// see if we won or not
 
 		updateGridCell(xMove, yMove, result, primaryStage);
 		NUKE.setDisable(false);
-//		buttonsClickedCount--;
-
 	}
 
 	private void updateGridCell(int x, int y, String result, Stage primaryStage) {
-//		Platform.runLater(() -> {
-		System.out.println("RESULT on updateGridCell: " + result);
 
 		// Determine if the update is for the user's grid or enemy's grid
 		if (result.equals("Hit") || result.equals("Miss")) {
 			char status = result.equals("Hit") ? 'H' : 'M';
-			System.out.println("STATUS: " + status);
 
 			// Update the user's grid if the opponent hits
 			if (myTurn) {
@@ -342,24 +310,17 @@ public class GuiClient extends Application{
 			}
 
 			if (ship != null && status == 'H') {
-				System.out.println("Hits Recorded Before Function Call: " + ship.hits);
 				ship.recordHit();
-				System.out.println("Hits Recorded After Function Call: " + ship.hits);
 				if (ship.isSunk()) {
-//						System.out.println("RECORDED AND SUNK");
 					highlightSunkShip(ship, myTurn);
 					if (!playingAI) {
 						if (myTurn) {
-							System.out.println("GameOverCheck Before Increment: " + gameOverCheck);
 							gameOverCheck++;
-							System.out.println("GameOverCheck After Increment: " + gameOverCheck);
 							if (gameOverCheck == 5) {
 								clientConnection.send(new Message(enemy, "Win", currUsername));
 							}
 						} else {
-							System.out.println("GameOverCheck2 Before Increment: " + gameOverCheck);
 							gameOverCheck2++;
-							System.out.println("GameOverCheck2 After Increment: " + gameOverCheck);
 							if (gameOverCheck2 == 5) {
 								clientConnection.send(new Message(currUsername, "Win", enemy));
 							}
@@ -367,7 +328,6 @@ public class GuiClient extends Application{
 					} else {
 						if(!myTurn){
 							gameOverCheck++;
-							System.out.printf("gameOverCheck on AI: " + gameOverCheck);
 							if(gameOverCheck == 5) {
 								primaryStage.setScene(sceneMap.get("victoryScene"));
 							}
@@ -384,13 +344,9 @@ public class GuiClient extends Application{
 	}
 
 	private ShipInfo findShipAt(int x, int y, ArrayList<ShipInfo> shipList) {
-		System.out.println("Looking for: " + x + ", " + y);
 		for (ShipInfo ship : shipList) {  // Assuming shipInfos holds all ships
-			System.out.println(ship.length + " positions: " + ship.positions);
 			for (Point pos : ship.getPositions()) {
 				if (pos.x == x && pos.y == y) {
-					System.out.println("FOUND SHIP");
-					System.out.println("POS: " + pos.x + ", " + pos.y);
 					return ship;
 				}
 			}
@@ -525,9 +481,7 @@ public class GuiClient extends Application{
 			start.setDisable(true);
 		}
 
-//		BorderPane pane = new BorderPane();
 		Button backBtn = getBackBtn("options", primaryStage);
-//		VBox root = new VBox(10);
 		Pane shipContainer = new Pane(); // container to hold all ships
 		shipContainer.setPrefSize(200, 60);
 
@@ -535,15 +489,11 @@ public class GuiClient extends Application{
 		start.setStyle(btnStyle);
 		start.setOnAction(e -> {
 			gameStarted = true;
-			System.out.println("Start clicked");
-			System.out.println("Sending current username: " + currUsername);
 			if(!playingAI) {
 				clientConnection.send(new Message(currUsername, "Pair", grid, shipInfos));
 			} else {
 				ai = new BattleshipAI();
-//				enemyGrid = ai.getGrid();
 				shipEnemyInfos.addAll(ai.getShipInfo());
-//				ai.setEnemyGrid(grid);
 				createUserVSUserScene(primaryStage, grid);
 			}
 		});
@@ -646,7 +596,6 @@ public class GuiClient extends Application{
 	private void handleButtonAction(int x, int y) {
 		// This is where you will handle the logic for what happens when a button is clicked
 		// For example, attack at (x, y) or place a ship
-		System.out.println("Button clicked at: (" + x + "," + y + ")");
 		if (gameStarted) {
 			buttons[x][y].setText("X");  // Mark the button as clicked or attacked
 			Message newMsg = new Message(x, y);
@@ -666,11 +615,9 @@ public class GuiClient extends Application{
 	}
 
 	private void removeShipFromGrid(ShipInfo ship) {
-		System.out.println("Removing ship with positions: " + ship.getPositions());
 		for (Point pos : ship.getPositions()) {
 			int x = pos.y;
 			int y = pos.x;
-			System.out.println("Clearing position: " + x + ", " + y);
 			buttons[x][y].setText("");  // Clear the text marking it as part of a ship
 			occupied[x][y] = false;  // Mark the cell as unoccupied
 			buttons[x][y].setStyle("-fx-background-color: #77BAFC;"); // Reset to default color
@@ -708,7 +655,6 @@ public class GuiClient extends Application{
 				grid.get(y).set(x, 'B');
 				ship.addPosition(y, x);
 			}
-//			System.out.println("ADDED SHIP: " + shipLength + " AT POSITION " + ship.positions);
 		}
 		else {
 			// Place ship vertically
@@ -812,8 +758,6 @@ public class GuiClient extends Application{
 		for (int x = 0; x < size; x++) {
 			for (int y = 0; y < size; y++) {
 				Button button = new Button();
-
-//				System.out.println(grid.get(x).get(y));
 				if(grid.get(x).get(y).equals('B')) {
 					button.setStyle("-fx-background-color: #000000;");
 				} else {
@@ -827,7 +771,6 @@ public class GuiClient extends Application{
 
 					handleGridClick(finalI, finalJ, button);
 					button.setDisable(true);
-//					buttonsClickedCount++;
 					hasSelectedCell = true;
 				});
 				buttons2[x][y] = button;
@@ -842,7 +785,6 @@ public class GuiClient extends Application{
 		for (int x = 0; x < size; x++) {
 			for (int y = 0; y < size; y++) {
 				Button button = new Button();
-//				System.out.println(grid.get(x).get(y));
 				if(enemyGrid.get(x).get(y).equals('W')) { // water
 					button.setStyle("-fx-background-color: #77BAFC;");
 				} else if(enemyGrid.get(x).get(y).equals('H')){ // successful hit
@@ -856,7 +798,6 @@ public class GuiClient extends Application{
 				button.setOnAction(e -> {
 					handleGridClick(finalI, finalJ, button);
 					button.setDisable(true);
-//					buttonsClickedCount++;
 					hasSelectedCell = true;
 				});
 				buttons2Enemy[x][y] = button;
@@ -938,9 +879,7 @@ public class GuiClient extends Application{
 
 		// sets the title and styling
 		Label title = new Label("Game Rules");
-//		title.setFont(titleStyle);
 		title.setStyle(titleStyle);
-//		title.setStyle("-fx-text-fill: #000000");
 
 		// sets all rules and makes sure the text wraps if it is too long for the window width
 		Label rule1 = new Label("1. Objective: The goal of Battleship is to sink all of your opponent's ships before they sink all of yours.");
@@ -991,18 +930,14 @@ public class GuiClient extends Application{
 		// Start Button and styling
 		Button startBtn = new Button("Start Game");
 
-//		startBtn.setFont(javafx.scene.text.Font.font("Arial", 20));
 		startBtn.setPrefSize(200, 50);
 		startBtn.setStyle(btnStyle);
-//		startBtn.setStyle("-fx-background-color: #1e90ff; -fx-text-fill: white; -fx-cursor: hand");
 		startBtn.setOnAction(e -> primaryStage.setScene(sceneMap.get("clientLogin")));
 
 		// Rules Button and styling
 		Button rulesBtn = new Button("Rules");
-//		rulesBtn.setFont(javafx.scene.text.Font.font("Arial", 20));
 		rulesBtn.setPrefSize(200, 50);
 		rulesBtn.setStyle(btnStyle);
-//		rulesBtn.setStyle("-fx-background-color: #1e90ff; -fx-text-fill: white; -fx-cursor: hand");
 		rulesBtn.setOnAction(e -> primaryStage.setScene(sceneMap.get("rules")));
 
 		// stores the start and rules button side by side

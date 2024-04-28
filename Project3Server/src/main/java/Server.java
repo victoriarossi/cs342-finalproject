@@ -141,11 +141,9 @@ public class Server{
 
 		// method to send a message to all clients or specific client
 		public void updateClients(Message message) {
-			System.out.println("UPDATING CLIENT: " + message.getPlayer1());
 			for(ClientThread t : clients) {
 				try {
 					if(t.clientName.equals(message.getPlayer1())) {
-						System.out.println("CONNECTED");
 						t.out.writeObject(message);
 					}
 				} catch (Exception e) {
@@ -159,16 +157,12 @@ public class Server{
 				UserInfo enemy = userStack.pop();
 				userInfos.add(enemy);
 				userInfos.add(new UserInfo(message.getPlayer1(),message.getPlayer1grid(), message.getShipInfo()));
-//					userInfos.add(new UserInfo(message.getPlayer1(),message.getPlayer1grid()));
-//					System.out.println("user: " + message.getPlayer1() + " enemy: " + enemy.getUsername());
 				if (!enemy.getUsername().equals(message.getPlayer1())) {
 					// go over the threads and look for the enemy's thread
 					for (ClientThread t : clients) {
 						if (enemy.getUsername().equals(t.clientName)) {
 							t.paired = true;
 							t.myTurn = true;
-//								System.out.println(t.clientName + "'s Grid on thread " +  enemy.getGrid());
-//							System.out.println("Sending " + enemy.getUsername() + " with " + message.getPlayer1() + " as enemy");
 							Message msg = new Message(enemy.getUsername(), "Paired", message.getPlayer1(), enemy.getGrid(), true);
 							try {
 								t.out.writeObject(msg);
@@ -177,7 +171,6 @@ public class Server{
 							}
 						} else if (message.getPlayer1().equals(t.clientName)) { // look for my thread
 							try {
-//								System.out.println("Sending " + message.getPlayer1() + " (should be bob) with " + enemy.getUsername() + " as enemy");
 								t.out.writeObject(new Message(message.getPlayer1(), "Paired", enemy.getUsername(), message.getPlayer1grid(), false));
 							} catch (Exception e) {
 								e.printStackTrace();
@@ -187,7 +180,6 @@ public class Server{
 				}
 			} else {
 				userStack.push(new UserInfo(message.getPlayer1(), message.getPlayer1grid(), message.getShipInfo()));
-//					userStack.push(new UserInfo(message.getPlayer1(), message.getPlayer1grid()));
 
 				for(ClientThread t : clients) {
 					if (t.clientName.equals(message.getPlayer1())) {
@@ -216,11 +208,8 @@ public class Server{
 							allShipsSunk = userInfo.areAllShipsSunk();
 						}
 					}
-					System.out.println("Updating enemy's grid: " + grid);
 					if(grid.get(message.getX()).get(message.getY()) == 'B'){
-						System.out.println("Set grid cell to B");
 						grid.get(message.getX()).set(message.getY(), 'H');
-						System.out.println("Checking if All Ships are Sunk");
 						updateClients(new Message("Hit", message.getPlayer1(),message.getPlayer2(), message.getX(), message.getY(), false, shipInfoList));
 						updateClients(new Message("Hit", message.getPlayer2(),message.getPlayer1(), message.getX(), message.getY(), true));
 						if (allShipsSunk) {
