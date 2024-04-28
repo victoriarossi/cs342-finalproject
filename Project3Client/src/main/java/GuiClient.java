@@ -87,6 +87,7 @@ public class GuiClient extends Application{
 	Boolean myTurn = false;
 
 	int gameOverCheck = 0;
+	int gameOverCheck2 = 0;
 
 	boolean whoWon = false;
 
@@ -162,14 +163,17 @@ public class GuiClient extends Application{
 
 						if ("Win".equals(msg.getMessageContent())) {
 							System.out.println("I am the winner");
-//						if (msg.getPlayer1() == currUsername) {
-//							whoWon = true;
-//						}
-//						updateGridCell(msg.getX(), msg.getY(), msg.getMessageContent(), primaryStage);
 							primaryStage.setScene(sceneMap.get("victoryScene"));
+//							if(msg.getPlayer1().equals(currUsername)){
+//								primaryStage.setScene(sceneMap.get("losingScene"));
+//							} else {
+//
+//							}
 						} else if ("Lose".equals(msg.getMessageContent())) {
+							System.out.println("I am the loser");
 							primaryStage.setScene(sceneMap.get("losingScene"));
-						} else if ("Hit".equals(msg.getMessageContent())) {
+						}
+						else if ("Hit".equals(msg.getMessageContent())) {
 							//update enemy's grid
 							enemyGrid.get(msg.getX()).set(msg.getY(), 'H');
 							myTurn = msg.getMyTurn();
@@ -278,7 +282,7 @@ public class GuiClient extends Application{
         });
 
 		primaryStage.setScene(sceneMap.get("startScene")); // starts the scene in the login scene
-		primaryStage.setTitle("win");
+		primaryStage.setTitle(currUsername);
 		primaryStage.show();
 	}
 
@@ -342,17 +346,37 @@ public class GuiClient extends Application{
 
 				// Update the button on the user's grid UI to reflect the hit or miss
 
-				ShipInfo ship = findShipAt(x, y);
+				ShipInfo ship;
+				if (myTurn) {
+					ship = findShipAt(x, y, shipInfos);
+				}
+				else {
+					ship = findShipAt(x, y, shipEnemyInfos);
+				}
+
 				if (ship != null && status == 'H') {
-
+					System.out.println("Hits Recorded Before Function Call: " + ship.hits);
 					ship.recordHit();
-
+					System.out.println("Hits Recorded After Function Call: " + ship.hits);
 					if (ship.isSunk()) {
-						System.out.println("RECORDED AND SUNK");
+//						System.out.println("RECORDED AND SUNK");
 						highlightSunkShip(ship, myTurn);
-						gameOverCheck++;
-						if (gameOverCheck == 5) {
-							clientConnection.send(new Message(currUsername, "Ship Sunk", enemy));
+
+						if (myTurn) {
+							System.out.println("GameOverCheck Before Increment: " + gameOverCheck);
+							gameOverCheck++;
+							System.out.println("GameOverCheck After Increment: " + gameOverCheck);
+							if (gameOverCheck == 5) {
+								clientConnection.send(new Message(enemy, "Win", currUsername));
+							}
+						}
+						else {
+							System.out.println("GameOverCheck2 Before Increment: " + gameOverCheck);
+							gameOverCheck2++;
+							System.out.println("GameOverCheck2 After Increment: " + gameOverCheck);
+							if (gameOverCheck2 == 5) {
+								clientConnection.send(new Message(currUsername, "Win", enemy));
+							}
 						}
 					}
 				}
@@ -360,9 +384,9 @@ public class GuiClient extends Application{
 //		});
 	}
 
-	private ShipInfo findShipAt(int x, int y) {
+	private ShipInfo findShipAt(int x, int y, ArrayList<ShipInfo> shipList) {
 		System.out.println("Looking for: " + x + ", " + y);
-		for (ShipInfo ship : shipEnemyInfos) {  // Assuming shipInfos holds all ships
+		for (ShipInfo ship : shipList) {  // Assuming shipInfos holds all ships
 			System.out.println(ship.length + " positions: " + ship.positions);
 			for (Point pos : ship.getPositions()) {
 				if (pos.x == x && pos.y == y) {
@@ -378,7 +402,7 @@ public class GuiClient extends Application{
 	private void highlightSunkShip(ShipInfo ship, boolean myTurn) {
 		Button[][] targetButtons = myTurn ? buttons2: buttons2Enemy;
 		for (Point part : ship.getPositions()) {
-			Button btn = targetButtons[part.x][part.y];  // Adjust if you need to update the enemy's grid instead
+			Button btn = targetButtons[part.x][part.y];
 			btn.setStyle("-fx-background-color: darkred;");
 		}
 	}
@@ -595,8 +619,6 @@ public class GuiClient extends Application{
 			}
 		});
 
-
-
 		horizontalBtn.setAlignment(Pos.CENTER);
 		verticalBtn.setAlignment(Pos.CENTER);
 		start.setAlignment(Pos.CENTER_RIGHT);
@@ -742,6 +764,8 @@ public class GuiClient extends Application{
 		initializeGrids();
 		buttons2 = new Button[size][size];
 		buttons2Enemy = new Button[size][size];
+		gameOverCheck = 0;
+		gameOverCheck2 = 0;
 
 		gameStarted = false;  // Reset game start flag
 		undoShipBtn.setDisable(true);
@@ -1013,17 +1037,7 @@ public class GuiClient extends Application{
 
 	private Scene createVictoryScene(Stage primaryStage) {
 		Text victoryText = new Text("Congratulations! You Win!");
-//		String theWin;
-//		if (whoWon) {
-//			// Creating the Text for Victory Message
-//			victoryText = new Text("Congratulations! You Win!");
-//			theWin = "winImage.jpg";
-//		}
-//		else {
-//			// Creating the Text for Victory Message
-//			victoryText = new Text("LOSER! You LOST!");
-//			theWin = "loseImage.jpg";
-//		}
+
 		victoryText.setFont(Font.font("Arial", FontWeight.BOLD, 24));
 		victoryText.setFill(Color.YELLOW);
 

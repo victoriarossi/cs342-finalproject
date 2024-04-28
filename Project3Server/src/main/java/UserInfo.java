@@ -32,4 +32,14 @@ public class UserInfo {
 		}
 		return true;
 	}
+
+	public boolean oneShipSunk() {
+		for (ShipInfo ship : shipInfoList) {
+			System.out.println("Checking if ship sunk: " + ship.isSunk());
+			if (ship.isSunk()) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

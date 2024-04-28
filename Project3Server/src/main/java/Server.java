@@ -105,11 +105,16 @@ public class Server{
 						} else if("Move".equals(message.getMessageContent())){
 							playMove(message);
 						}
-						else if ("Ship Sunk".equals(message.getMessageContent())) {
+						else if ("Win".equals(message.getMessageContent())) {
 //							playMove(message);
 							updateClients(new Message(message.getPlayer1(), "Win", message.getPlayer2()));
 							updateClients(new Message(message.getPlayer2(), "Lose", message.getPlayer1()));
 						}
+//						else if ("Lose".equals(message.getMessageContent())) {
+////							playMove(message);
+//							updateClients(new Message(message.getPlayer1(), "Win", message.getPlayer2()));
+//							updateClients(new Message(message.getPlayer2(), "Lose", message.getPlayer1()));
+//						}
 					}
 				}
 			}
@@ -211,8 +216,6 @@ public class Server{
 							allShipsSunk = userInfo.areAllShipsSunk();
 						}
 					}
-
-
 					System.out.println("Updating enemy's grid: " + grid);
 					if(grid.get(message.getX()).get(message.getY()) == 'B'){
 						System.out.println("Set grid cell to B");
@@ -222,7 +225,7 @@ public class Server{
 						updateClients(new Message("Hit", message.getPlayer2(),message.getPlayer1(), message.getX(), message.getY(), true));
 						if (allShipsSunk) {
 							updateClients(new Message("Win", message.getPlayer1(), message.getPlayer2(), message.getX(), message.getY(), false, shipInfoList));
-							updateClients(new Message("Win", message.getPlayer2(),message.getPlayer1(), message.getX(), message.getY(), true));
+							updateClients(new Message("Lose", message.getPlayer2(),message.getPlayer1(), message.getX(), message.getY(), true));
 						}
 
 					} else if(grid.get(message.getX()).get(message.getY()) == 'W'){

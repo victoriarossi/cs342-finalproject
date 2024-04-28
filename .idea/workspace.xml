@@ -4,9 +4,21 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" name="Changes" comment="" />
-    <list id="39e23b1b-9ec1-49b7-9db6-932185b08be2" name="Changes by Bulgy" comment="" />
-    <list id="3c6fb92b-5a23-4eca-9dec-3aa8aaadbb66" name="Changes by victoriarossi" comment="" />
+    <list default="true" id="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project3Client/src/main/java/GuiClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project3Client/src/main/java/GuiClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project3Client/src/main/java/Message.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project3Client/src/main/java/Message.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project3Server/src/main/java/Message.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project3Server/src/main/java/Message.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project3Server/src/main/java/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project3Server/src/main/java/Server.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project3Server/src/main/java/UserInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project3Server/src/main/java/UserInfo.java" afterDir="false" />
+    </list>
+    <list id="9b43e7fa-44e5-4d36-8f75-0021298bf27e" name="Changes by Bulgy" comment="">
+      <change beforePath="$PROJECT_DIR$/Project3Client/src/main/java/GuiClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project3Client/src/main/java/GuiClient.java" afterDir="false" />
+    </list>
+    <list id="752a318d-1003-4c06-9259-761f951bb49d" name="Changes by victoriarossi" comment="">
+      <change beforePath="$PROJECT_DIR$/Project3Client/src/main/java/GuiClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project3Client/src/main/java/GuiClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project3Server/src/main/java/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project3Server/src/main/java/Server.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -37,6 +49,38 @@
     &quot;accountId&quot;: &quot;3237aa44-2960-498c-89fa-5b63ccfdf2b5&quot;
   }
 }</component>
+  <component name="LineStatusTrackerManager">
+    <file path="$PROJECT_DIR$/Project3Server/src/main/java/Server.java">
+      <ranges>
+        <range start1="107" end1="108" start2="107" end2="108" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
+        <range start1="112" end1="112" start2="112" end2="117" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
+        <range start1="213" end1="215" start2="218" end2="218" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
+        <range start1="224" end1="225" start2="227" end2="228" changelist="752a318d-1003-4c06-9259-761f951bb49d" />
+      </ranges>
+    </file>
+    <file path="$PROJECT_DIR$/Project3Client/src/main/java/GuiClient.java">
+      <ranges>
+        <range start1="89" end1="89" start2="89" end2="90" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
+        <range start1="164" end1="168" start2="165" end2="165" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
+        <range start1="169" end1="169" start2="166" end2="171" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
+        <range start1="170" end1="170" start2="172" end2="173" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
+        <range start1="171" end1="172" start2="174" end2="176" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
+        <range start1="280" end1="281" start2="284" end2="285" changelist="9b43e7fa-44e5-4d36-8f75-0021298bf27e" />
+        <range start1="344" end1="345" start2="348" end2="356" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
+        <range start1="346" end1="347" start2="357" end2="358" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
+        <range start1="348" end1="349" start2="359" end2="360" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
+        <range start1="350" end1="351" start2="361" end2="362" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
+        <range start1="352" end1="355" start2="363" end2="371" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
+        <range start1="356" end1="356" start2="372" end2="380" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
+        <range start1="362" end1="363" start2="386" end2="387" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
+        <range start1="364" end1="365" start2="388" end2="389" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
+        <range start1="380" end1="381" start2="404" end2="405" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
+        <range start1="597" end1="599" start2="621" end2="621" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
+        <range start1="744" end1="744" start2="766" end2="768" changelist="752a318d-1003-4c06-9259-761f951bb49d" />
+        <range start1="1015" end1="1026" start2="1039" end2="1040" changelist="aec4a726-c9fe-4b2d-9bb6-d7721ca00ffb" />
+      </ranges>
+    </file>
+  </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
@@ -90,7 +134,6 @@
         <option name="myRunnerSettings" />
         <option name="myRunnerParameters">
           <MavenRunnerParameters>
-            <option name="cmdOptions" />
             <option name="profiles">
               <set />
             </option>
@@ -101,13 +144,9 @@
                 <option value="exec:java" />
               </list>
             </option>
-            <option name="multimoduleDir" />
             <option name="pomFileName" />
             <option name="profilesMap">
               <map />
-            </option>
-            <option name="projectsCmdOptionValues">
-              <list />
             </option>
             <option name="resolveToWorkspace" value="false" />
             <option name="workingDirPath" value="$PROJECT_DIR$/Project3Client" />
@@ -122,7 +161,6 @@
         <option name="myRunnerSettings" />
         <option name="myRunnerParameters">
           <MavenRunnerParameters>
-            <option name="cmdOptions" />
             <option name="profiles">
               <set />
             </option>
@@ -133,13 +171,9 @@
                 <option value="exec:java" />
               </list>
             </option>
-            <option name="multimoduleDir" />
             <option name="pomFileName" />
             <option name="profilesMap">
               <map />
-            </option>
-            <option name="projectsCmdOptionValues">
-              <list />
             </option>
             <option name="resolveToWorkspace" value="false" />
             <option name="workingDirPath" value="$PROJECT_DIR$/Project3Server" />

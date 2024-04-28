@@ -20,7 +20,10 @@ public class Message implements Serializable {
     private int y; // column
     private String userIDReceiver; // ID of user receiving a private message
     private boolean myTurn;
+
+    ShipInfo ship;
     private ArrayList<ShipInfo> shipInfos;
+
 
     // Constructor to initialize message object with userID, message content, and type of message
 //    public Message(String player1, String player2) {
@@ -42,6 +45,23 @@ public class Message implements Serializable {
         this.playingAI = false;
         this.player1grid = grid;
         this.shipInfos = shipInfos;
+    }
+
+    public Message(String player1, String messageContent, ArrayList<ArrayList<Character>> grid, ShipInfo ship){
+        this.player1 = player1;
+        this.messageContent = messageContent;
+        this.playingAI = false;
+        this.player1grid = grid;
+        this.ship = ship;
+    }
+
+    public Message(String player1, String messageContent, ArrayList<ArrayList<Character>> grid, ArrayList<ArrayList<Character>> enemyGrid ,ShipInfo ship){
+        this.player1 = player1;
+        this.messageContent = messageContent;
+        this.playingAI = false;
+        this.player1grid = grid;
+        this.player2grid = enemyGrid;
+        this.ship = ship;
     }
 
     public Message(String player1, String messageContent, String player2, ArrayList<ArrayList<Character>> grid, Boolean myTurn, ArrayList<ShipInfo> shipInfos){
@@ -113,6 +133,10 @@ public class Message implements Serializable {
     // getter to retrieve userID of the message
     public String getPlayer2() {
         return player2;
+    }
+
+    public ShipInfo getShip() {
+        return ship;
     }
 
 
