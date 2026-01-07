@@ -98,8 +98,8 @@ If you included hand-drawn wireframes, they’re still worth keeping in the repo
 ## Team
 
 Group project for CS 342.  
-Victoria Rossi  
-Shaan Kohli  
+Victoria Rossi,  
+Shaan Kohli,
 Hristian Tountchev   
 
 ---
